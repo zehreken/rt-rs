@@ -1,3 +1,7 @@
+mod primitives;
+pub use crate::primitives::vec3::*;
+
 fn main() {
-    println!("Hello, world!");
+    let _vector = Vec3::zero();
+    println!("{}", _vector.x());
 }
