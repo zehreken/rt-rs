@@ -52,7 +52,7 @@ pub mod vec3 {
         }
 
         pub fn squared_length(self) -> f32 {
-            return self.x * self.x + self.y + self.y + self.z * self.z;
+            return self.x * self.x + self.y * self.y + self.z * self.z;
         }
 
         pub fn length(self) -> f32 {
@@ -126,6 +126,13 @@ pub mod vec3 {
 mod vec3_tests {
     use crate::primitives::vec3::*;
     // use super::*;
+
+    #[test]
+    fn test_length() {
+        let a: Vec3 = Vec3::new(2.0, -3.0, -1.2);
+        assert_eq!(a.squared_length(), 14.440001);
+        assert_eq!(a.length(), 3.8);
+    }
 
     #[test]
     fn test_dot() {
