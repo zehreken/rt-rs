@@ -71,6 +71,55 @@ pub mod vec3 {
             );
         }
     }
+
+    use std::ops;
+    impl ops::Add<Vec3> for Vec3 {
+        type Output = Vec3;
+
+        fn add(self, other: Vec3) -> Vec3 {
+            Vec3 {
+                x: self.x + other.x,
+                y: self.y + other.y,
+                z: self.z + other.z,
+            }
+        }
+    }
+
+    impl ops::Sub<Vec3> for Vec3 {
+        type Output = Vec3;
+
+        fn sub(self, other: Vec3) -> Vec3 {
+            Vec3 {
+                x: self.x - other.x,
+                y: self.y - other.y,
+                z: self.z - other.z,
+            }
+        }
+    }
+
+    impl ops::Mul<f32> for Vec3 {
+        type Output = Vec3;
+
+        fn mul(self, other: f32) -> Vec3 {
+            Vec3 {
+                x: self.x * other,
+                y: self.y * other,
+                z: self.z * other,
+            }
+        }
+    }
+
+    impl ops::Div<f32> for Vec3 {
+        type Output = Vec3;
+
+        fn div(self, other: f32) -> Vec3 {
+            Vec3 {
+                x: self.x / other,
+                y: self.y / other,
+                z: self.z / other,
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -96,5 +145,15 @@ mod vec3_tests {
         assert_eq!(Vec3::cross(b, b).y(), 0.0);
         assert_eq!(Vec3::cross(a, b).x(), 8.0);
         assert_eq!(Vec3::cross(b, a).z(), -4.0);
+    }
+
+    #[test]
+    fn test_operations() {
+        let a: Vec3 = Vec3::new(1.0, 2.0, 3.0);
+        let b: Vec3 = Vec3::new(-3.0, -2.0, 1.0);
+        assert_eq!((a + b).x(), -2.0);
+        assert_eq!((a - b).y(), 4.0);
+        assert_eq!((a * 3.0).x(), 3.0);
+        assert_eq!((a / 2.0).y(), 1.0);
     }
 }
