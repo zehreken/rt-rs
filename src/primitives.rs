@@ -70,6 +70,10 @@ pub mod vec3 {
                 a.x * b.y - a.y * b.x,
             );
         }
+
+        pub fn unit_vector(self) -> Vec3 {
+            return self / self.length();
+        }
     }
 
     use std::ops;
@@ -109,6 +113,18 @@ pub mod vec3 {
         }
     }
 
+    impl ops::Mul<Vec3> for f32 {
+        type Output = Vec3;
+
+        fn mul(self, other: Vec3) -> Vec3 {
+            Vec3 {
+                x: other.x() * self,
+                y: other.y() * self,
+                z: other.z() * self,
+            }
+        }
+    }
+
     impl ops::Div<f32> for Vec3 {
         type Output = Vec3;
 
@@ -117,6 +133,18 @@ pub mod vec3 {
                 x: self.x / other,
                 y: self.y / other,
                 z: self.z / other,
+            }
+        }
+    }
+
+    impl ops::Div<Vec3> for f32 {
+        type Output = Vec3;
+
+        fn div(self, other: Vec3) -> Vec3 {
+            Vec3 {
+                x: other.x() / self,
+                y: other.y() / self,
+                z: other.z() / self,
             }
         }
     }

@@ -1,5 +1,6 @@
 pub mod sphere {
     use crate::primitives::vec3::*;
+    use crate::ray::ray::*;
     use std::fmt;
 
     #[derive(Debug, Copy, Clone)]
@@ -22,7 +23,7 @@ pub mod sphere {
             }
         }
 
-        pub fn hit() -> bool {
+        pub fn hit(ray: Ray, t_min: f32, t_max: f32, hit_record: &HitRecord) -> bool {
             return false;
         }
     }
