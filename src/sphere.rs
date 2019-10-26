@@ -3,6 +3,10 @@ pub mod sphere {
     use crate::ray::ray::*;
     use std::fmt;
 
+    pub trait Hitable {
+        fn hit(self, ray: Ray, t_min: f32, t_max: f32 /*, hit_record: &HitRecord*/) -> f32;
+    }
+
     #[derive(Debug, Copy, Clone)]
     pub struct Sphere {
         center: Vec3,
@@ -15,20 +19,8 @@ pub mod sphere {
         }
     }
 
-    impl Sphere {
-        pub fn new(center: Vec3, radius: f32) -> Sphere {
-            Sphere {
-                center: center,
-                radius: radius,
-            }
-        }
-
-        pub fn hit(
-            self,
-            ray: Ray,
-            t_min: f32,
-            t_max: f32, /*, hit_record: &HitRecord*/
-        ) -> f32 {
+    impl Hitable for Sphere {
+        fn hit(self, ray: Ray, t_min: f32, t_max: f32 /*, hit_record: &HitRecord*/) -> f32 {
             let origin_to_center: Vec3 = ray.origin() - self.center;
             let a: f32 = Vec3::dot(ray.direction(), ray.direction());
             let b: f32 = 2.0 * Vec3::dot(origin_to_center, ray.direction());
@@ -39,6 +31,15 @@ pub mod sphere {
                 return -1.0;
             } else {
                 return (-b - discriminant.sqrt()) / (2.0 * a);
+            }
+        }
+    }
+
+    impl Sphere {
+        pub fn new(center: Vec3, radius: f32) -> Sphere {
+            Sphere {
+                center: center,
+                radius: radius,
             }
         }
     }
