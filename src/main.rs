@@ -1,6 +1,8 @@
 extern crate image;
 mod primitives;
 pub use crate::primitives::vec3::*;
+mod ray;
+pub use crate::ray::ray::*;
 
 pub const WIDTH: u32 = 800;
 pub const HEIGHT: u32 = 400;
