@@ -3,6 +3,13 @@ pub mod ray {
     use std::fmt;
 
     #[derive(Debug, Copy, Clone)]
+    pub struct HitRecord {
+        t: f32,
+        p: Vec3,
+        normal: Vec3,
+    }
+
+    #[derive(Debug, Copy, Clone)]
     pub struct Ray {
         from: Vec3,
         to: Vec3,
