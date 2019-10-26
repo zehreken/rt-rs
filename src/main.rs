@@ -37,12 +37,14 @@ fn main() {
 
 fn color(ray: Ray) -> Vec3 {
     let sphere: Sphere = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5);
-    if sphere.hit(ray, 1.0, 100.0) {
-        return Vec3::new(1.0, 0.0, 0.0);
+    let mut t:f32 = sphere.hit(ray, 0.0, 100.0);
+    if t > 0.0 {
+        let normal:Vec3 = (ray.point_at(t) - Vec3::new(0.0, 0.0, -1.0)).unit_vector();
+        return 0.5 * Vec3::new(normal.x() + 1.0, normal.y() + 1.0, normal.z() + 1.0);
     }
 
     let unit_direction: Vec3 = ray.direction().unit_vector();
-    let t: f32 = 0.5 * (unit_direction.y() + 1.0);
+    t = 0.5 * (unit_direction.y() + 1.0);
 
     return (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0);
 }
