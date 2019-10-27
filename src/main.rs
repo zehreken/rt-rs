@@ -5,6 +5,8 @@ mod ray;
 use crate::ray::ray::*;
 mod sphere;
 use crate::sphere::sphere::*;
+mod camera;
+use crate::camera::camera::*;
 
 pub const WIDTH: u32 = 800;
 pub const HEIGHT: u32 = 400;
@@ -14,22 +16,19 @@ fn main() {
     let _vector = Vec3::zero();
     println!("{}", _vector);
 
-    let lower_left_corner = Vec3::new(-2.0, -1.0, -1.0);
-    let horizontal = Vec3::new(4.0, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, 2.0, 0.0);
-    let origin = Vec3::new(0.0, 0.0, 0.0);
-
-    // let mut world: HitableList = HitableList::new();
-    // world.list.push(Sphere::new(Vec3::new(0.0, 0.0, 0.0), 0.5));
-    let mut objects:Vec<Sphere> = Vec::new();
+    let camera = Camera::new();
+    let mut objects: Vec<Sphere> = Vec::new();
     objects.push(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5));
+
+    objects.push(Sphere::new(Vec3::new(0.0, -1000.5, -1.0), 1000.0));
 
     let mut img_buf = image::ImageBuffer::new(WIDTH, HEIGHT);
     for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
         let u: f32 = x as f32 / WIDTH as f32;
         let v: f32 = (HEIGHT - y) as f32 / HEIGHT as f32; // invert y
 
-        let ray = Ray::new(origin, lower_left_corner + u * horizontal + v * vertical);
+        // let ray = Ray::new(origin, lower_left_corner + u * horizontal + v * vertical);
+        let ray = camera.get_ray(u, v);
         let color = color(ray, &objects);
         *pixel = image::Rgb([
             (color.r() * 255.0) as u8,
@@ -43,7 +42,7 @@ fn main() {
 fn color(ray: Ray, objects: &[Sphere]) -> Vec3 {
     let mut hit_record: HitRecord = HitRecord::new();
     let mut has_hit = false;
-    let t_min:f32 = 0.0;
+    let t_min: f32 = 0.0;
     let mut closest_so_far: f32 = 10000000.0;
 
     for obj in objects {
