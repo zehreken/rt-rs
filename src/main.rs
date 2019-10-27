@@ -1,4 +1,6 @@
 extern crate image;
+extern crate rand;
+use rand::Rng;
 mod primitives;
 use crate::primitives::vec3::*;
 mod ray;
@@ -13,8 +15,7 @@ pub const HEIGHT: u32 = 400;
 pub const SAMPLE: u32 = 100;
 
 fn main() {
-    let _vector = Vec3::zero();
-    println!("{}", _vector);
+    let mut rng = rand::thread_rng();
 
     let camera = Camera::new();
     let mut objects: Vec<Sphere> = Vec::new();
@@ -24,16 +25,19 @@ fn main() {
 
     let mut img_buf = image::ImageBuffer::new(WIDTH, HEIGHT);
     for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
-        let u: f32 = x as f32 / WIDTH as f32;
-        let v: f32 = (HEIGHT - y) as f32 / HEIGHT as f32; // invert y
+        let mut col = Vec3::zero();
+        for z in 0..100 {
+            let u: f32 = (x as f32 + rng.gen::<f32>()) / WIDTH as f32;
+            let v: f32 = ((HEIGHT - y) as f32 + rng.gen::<f32>()) / HEIGHT as f32; // invert y
+            let ray = camera.get_ray(u, v);
+            col = col + color(ray, &objects);
+        }
 
-        // let ray = Ray::new(origin, lower_left_corner + u * horizontal + v * vertical);
-        let ray = camera.get_ray(u, v);
-        let color = color(ray, &objects);
+        col = col / SAMPLE as f32;
         *pixel = image::Rgb([
-            (color.r() * 255.0) as u8,
-            (color.g() * 255.0) as u8,
-            (color.b() * 255.0) as u8,
+            (col.r() * 255.0) as u8,
+            (col.g() * 255.0) as u8,
+            (col.b() * 255.0) as u8,
         ]);
     }
     img_buf.save("out/basic.png").unwrap();
