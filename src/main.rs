@@ -12,7 +12,7 @@ use crate::camera::camera::*;
 
 pub const WIDTH: u32 = 800;
 pub const HEIGHT: u32 = 400;
-pub const SAMPLE: u32 = 100;
+pub const SAMPLE: u32 = 10;
 
 fn main() {
     let mut rng = rand::thread_rng();
@@ -26,7 +26,7 @@ fn main() {
     let mut img_buf = image::ImageBuffer::new(WIDTH, HEIGHT);
     for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
         let mut col = Vec3::zero();
-        for z in 0..100 {
+        for _z in 0..SAMPLE {
             let u: f32 = (x as f32 + rng.gen::<f32>()) / WIDTH as f32;
             let v: f32 = ((HEIGHT - y) as f32 + rng.gen::<f32>()) / HEIGHT as f32; // invert y
             let ray = camera.get_ray(u, v);
