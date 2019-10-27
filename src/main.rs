@@ -19,13 +19,18 @@ fn main() {
     let vertical = Vec3::new(0.0, 2.0, 0.0);
     let origin = Vec3::new(0.0, 0.0, 0.0);
 
+    // let mut world: HitableList = HitableList::new();
+    // world.list.push(Sphere::new(Vec3::new(0.0, 0.0, 0.0), 0.5));
+    let mut objects:Vec<Sphere> = Vec::new();
+    objects.push(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5));
+
     let mut img_buf = image::ImageBuffer::new(WIDTH, HEIGHT);
     for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
         let u: f32 = x as f32 / WIDTH as f32;
         let v: f32 = (HEIGHT - y) as f32 / HEIGHT as f32; // invert y
 
         let ray = Ray::new(origin, lower_left_corner + u * horizontal + v * vertical);
-        let color = color(ray);
+        let color = color(ray, &objects);
         *pixel = image::Rgb([
             (color.r() * 255.0) as u8,
             (color.g() * 255.0) as u8,
@@ -35,16 +40,47 @@ fn main() {
     img_buf.save("out/basic.png").unwrap();
 }
 
-fn color(ray: Ray) -> Vec3 {
-    let sphere: Sphere = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5);
-    let mut t: f32 = sphere.hit(ray, 0.0, 100.0);
-    if t > 0.0 {
-        let normal: Vec3 = (ray.point_at(t) - Vec3::new(0.0, 0.0, -1.0)).unit_vector();
-        return 0.5 * Vec3::new(normal.x() + 1.0, normal.y() + 1.0, normal.z() + 1.0);
+fn color(ray: Ray, objects: &[Sphere]) -> Vec3 {
+    let mut hit_record: HitRecord = HitRecord::new();
+    let mut has_hit = false;
+    let t_min:f32 = 0.0;
+    let mut closest_so_far: f32 = 10000000.0;
+
+    for obj in objects {
+        if obj.hit(ray, t_min, closest_so_far, &mut hit_record) {
+            has_hit = true;
+            closest_so_far = hit_record.t;
+        }
     }
 
-    let unit_direction: Vec3 = ray.direction().unit_vector();
-    t = 0.5 * (unit_direction.y() + 1.0);
+    if has_hit {
+        return 0.5
+            * Vec3::new(
+                hit_record.normal.x() + 1.0,
+                hit_record.normal.y() + 1.0,
+                hit_record.normal.z() + 1.0,
+            );
+    } else {
+        let unit_direction: Vec3 = ray.direction().unit_vector();
+        let t: f32 = 0.5 * (unit_direction.y() + 1.0);
 
-    return (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0);
+        return (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0);
+    }
 }
+
+// fn color(ray: Ray, world: &HitableList) -> Vec3 {
+//     let mut hit_record: HitRecord = HitRecord::new();
+//     if world.hit(ray, 0.0, 100.0, &mut hit_record) {
+//         return 0.5
+//             * Vec3::new(
+//                 hit_record.normal.x() + 1.0,
+//                 hit_record.normal.y() + 1.0,
+//                 hit_record.normal.z() + 1.0,
+//             );
+//     } else {
+//         let unit_direction: Vec3 = ray.direction().unit_vector();
+//         let t: f32 = 0.5 * (unit_direction.y() + 1.0);
+
+//         return (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0);
+//     }
+// }

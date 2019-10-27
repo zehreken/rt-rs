@@ -4,9 +4,19 @@ pub mod ray {
 
     #[derive(Debug, Copy, Clone)]
     pub struct HitRecord {
-        t: f32,
-        p: Vec3,
-        normal: Vec3,
+        pub t: f32,
+        pub p: Vec3,
+        pub normal: Vec3,
+    }
+
+    impl HitRecord {
+        pub fn new() -> HitRecord {
+            HitRecord {
+                t: 0.0,
+                p: Vec3::zero(),
+                normal: Vec3::zero(),
+            }
+        }
     }
 
     #[derive(Debug, Copy, Clone)]
