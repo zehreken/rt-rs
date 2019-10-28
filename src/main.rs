@@ -12,7 +12,7 @@ use crate::camera::camera::*;
 
 pub const WIDTH: u32 = 800;
 pub const HEIGHT: u32 = 400;
-pub const SAMPLE: u32 = 10;
+pub const SAMPLE: u32 = 100;
 
 fn main() {
     let mut rng = rand::thread_rng();
@@ -21,7 +21,8 @@ fn main() {
     let mut objects: Vec<Sphere> = Vec::new();
     objects.push(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5));
 
-    objects.push(Sphere::new(Vec3::new(0.0, -1000.5, -1.0), 1000.0));
+    objects.push(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0));
+    // objects.push(Sphere::new(Vec3::new(0.0, -1000.5, -1.0), 1000.0)); This causes a weird glitch
 
     let mut img_buf = image::ImageBuffer::new(WIDTH, HEIGHT);
     for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
@@ -34,6 +35,8 @@ fn main() {
         }
 
         col = col / SAMPLE as f32;
+        col = Vec3::new(col.r().sqrt(), col.g().sqrt(), col.b().sqrt()); // Gamma correction
+
         *pixel = image::Rgb([
             (col.r() * 255.0) as u8,
             (col.g() * 255.0) as u8,
@@ -47,7 +50,7 @@ fn color(ray: Ray, objects: &[Sphere]) -> Vec3 {
     let mut hit_record: HitRecord = HitRecord::new();
     let mut has_hit = false;
     let t_min: f32 = 0.0;
-    let mut closest_so_far: f32 = 10000000.0;
+    let mut closest_so_far: f32 = std::f32::MAX;
 
     for obj in objects {
         if obj.hit(ray, t_min, closest_so_far, &mut hit_record) {
@@ -57,12 +60,8 @@ fn color(ray: Ray, objects: &[Sphere]) -> Vec3 {
     }
 
     if has_hit {
-        return 0.5
-            * Vec3::new(
-                hit_record.normal.x() + 1.0,
-                hit_record.normal.y() + 1.0,
-                hit_record.normal.z() + 1.0,
-            );
+        let target: Vec3 = hit_record.p + hit_record.normal + random_in_unit_sphere();
+        return 0.5 * color(Ray::new(hit_record.p, target - hit_record.p), objects);
     } else {
         let unit_direction: Vec3 = ray.direction().unit_vector();
         let t: f32 = 0.5 * (unit_direction.y() + 1.0);
@@ -71,19 +70,14 @@ fn color(ray: Ray, objects: &[Sphere]) -> Vec3 {
     }
 }
 
-// fn color(ray: Ray, world: &HitableList) -> Vec3 {
-//     let mut hit_record: HitRecord = HitRecord::new();
-//     if world.hit(ray, 0.0, 100.0, &mut hit_record) {
-//         return 0.5
-//             * Vec3::new(
-//                 hit_record.normal.x() + 1.0,
-//                 hit_record.normal.y() + 1.0,
-//                 hit_record.normal.z() + 1.0,
-//             );
-//     } else {
-//         let unit_direction: Vec3 = ray.direction().unit_vector();
-//         let t: f32 = 0.5 * (unit_direction.y() + 1.0);
+fn random_in_unit_sphere() -> Vec3 {
+    let mut rng = rand::thread_rng();
+    let mut p: Vec3 = 2.0 * Vec3::new(rng.gen::<f32>(), rng.gen::<f32>(), rng.gen::<f32>())
+        - Vec3::new(1.0, 1.0, 1.0);
+    while Vec3::dot(p, p) >= 1.0 {
+        p = 2.0 * Vec3::new(rng.gen::<f32>(), rng.gen::<f32>(), rng.gen::<f32>())
+            - Vec3::new(1.0, 1.0, 1.0);
+    }
 
-//         return (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0);
-//     }
-// }
+    return p;
+}

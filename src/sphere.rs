@@ -2,7 +2,6 @@ pub mod sphere {
     use crate::primitives::vec3::*;
     use crate::ray::ray::*;
     use std::fmt;
-    use std::vec::Vec;
 
     pub trait Hitable {
         fn hit(self, ray: Ray, t_min: f32, t_max: f32, hit_record: &mut HitRecord) -> bool;
@@ -57,33 +56,6 @@ pub mod sphere {
                 center: center,
                 radius: radius,
             }
-        }
-    }
-
-    pub struct HitableList {
-        pub list: Vec<Sphere>,
-    }
-
-    impl HitableList {
-        pub fn new() -> HitableList {
-            HitableList { list: Vec::new() }
-        }
-    }
-
-    impl Hitable for HitableList {
-        fn hit(self, ray: Ray, t_min: f32, t_max: f32, hit_record: &mut HitRecord) -> bool {
-            let mut temp_record: HitRecord = HitRecord::new();
-            let mut has_hit = false;
-            let mut closest_so_far: f32 = t_max;
-            for obj in self.list.iter() {
-                if obj.hit(ray, t_min, closest_so_far, &mut temp_record) {
-                    has_hit = true;
-                    closest_so_far = temp_record.t;
-                    *hit_record = temp_record;
-                }
-            }
-
-            return has_hit;
         }
     }
 }
