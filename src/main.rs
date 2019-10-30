@@ -9,19 +9,21 @@ mod sphere;
 use crate::sphere::sphere::*;
 mod camera;
 use crate::camera::camera::*;
+mod utility;
+use crate::utility::utility::*;
 
 pub const WIDTH: u32 = 800;
 pub const HEIGHT: u32 = 400;
-pub const SAMPLE: u32 = 100;
+pub const SAMPLE: u32 = 10;
 
 fn main() {
     let mut rng = rand::thread_rng();
 
     let camera = Camera::new();
     let mut objects: Vec<Sphere> = Vec::new();
-    objects.push(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5));
+    objects.push(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, 0));
 
-    objects.push(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0));
+    objects.push(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, 0));
     // objects.push(Sphere::new(Vec3::new(0.0, -1000.5, -1.0), 1000.0)); This causes a weird glitch
 
     let mut img_buf = image::ImageBuffer::new(WIDTH, HEIGHT);
@@ -68,16 +70,4 @@ fn color(ray: Ray, objects: &[Sphere]) -> Vec3 {
 
         return (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0);
     }
-}
-
-fn random_in_unit_sphere() -> Vec3 {
-    let mut rng = rand::thread_rng();
-    let mut p: Vec3 = 2.0 * Vec3::new(rng.gen::<f32>(), rng.gen::<f32>(), rng.gen::<f32>())
-        - Vec3::new(1.0, 1.0, 1.0);
-    while Vec3::dot(p, p) >= 1.0 {
-        p = 2.0 * Vec3::new(rng.gen::<f32>(), rng.gen::<f32>(), rng.gen::<f32>())
-            - Vec3::new(1.0, 1.0, 1.0);
-    }
-
-    return p;
 }

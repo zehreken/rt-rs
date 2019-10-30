@@ -1,6 +1,7 @@
 pub mod sphere {
     use crate::primitives::vec3::*;
     use crate::ray::ray::*;
+    use crate::utility::utility::*;
     use std::fmt;
 
     pub trait Hitable {
@@ -11,6 +12,7 @@ pub mod sphere {
     pub struct Sphere {
         center: Vec3,
         radius: f32,
+        material: u8,
     }
 
     impl fmt::Display for Sphere {
@@ -51,11 +53,35 @@ pub mod sphere {
     }
 
     impl Sphere {
-        pub fn new(center: Vec3, radius: f32) -> Sphere {
+        pub fn new(center: Vec3, radius: f32, material: u8) -> Sphere {
             Sphere {
                 center: center,
                 radius: radius,
+                material: material,
             }
+        }
+
+        pub fn scatter(self) -> bool {
+            if self.material == 0 {
+                return self.lambertian();
+            } else if self.material == 1 {
+                return self.metal();
+            } else {
+                return self.lambertian(); // default is lambertian
+            }
+        }
+
+        fn lambertian(self// ray: Ray,
+            // hit_record: HitRecord,
+            // attenuation: Vec3,
+            // scattered: Ray,
+        ) -> bool {
+            // let target = hit_record.p + hit_record.normal + random_in_unit_sphere();
+            return true;
+        }
+
+        fn metal(self) -> bool {
+            return true;
         }
     }
 }
