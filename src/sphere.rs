@@ -6,6 +6,12 @@ pub mod sphere {
 
     pub trait Hitable {
         fn hit(self, ray: Ray, t_min: f32, t_max: f32, hit_record: &mut HitRecord) -> bool;
+        fn scatter(
+            self,
+            ray: Ray,
+            hit_record: &mut HitRecord,
+            test: &mut Test,
+        ) -> bool;
     }
 
     #[derive(Debug, Copy, Clone)]
@@ -50,6 +56,23 @@ pub mod sphere {
 
             return false;
         }
+
+        fn scatter(
+            self,
+            ray: Ray,
+            hit_record: &mut HitRecord,
+            test: &mut Test,
+        ) -> bool {
+            if self.material == 0 {
+                return self.lambertian(ray, hit_record, test);
+            } else if self.material == 1 {
+                return self.metal();
+            } else if self.material == 2 {
+                return self.dielectric();
+            } else {
+                return self.metal(); // default is lambertian
+            }
+        }
     }
 
     impl Sphere {
@@ -61,26 +84,23 @@ pub mod sphere {
             }
         }
 
-        pub fn scatter(self) -> bool {
-            if self.material == 0 {
-                return self.lambertian();
-            } else if self.material == 1 {
-                return self.metal();
-            } else {
-                return self.lambertian(); // default is lambertian
-            }
-        }
-
-        fn lambertian(self// ray: Ray,
-            // hit_record: HitRecord,
-            // attenuation: Vec3,
-            // scattered: Ray,
+        fn lambertian(
+            self,
+            ray: Ray,
+            hit_record: &mut HitRecord,
+            test: &mut Test,
         ) -> bool {
-            // let target = hit_record.p + hit_record.normal + random_in_unit_sphere();
+            let target = hit_record.p + hit_record.normal + random_in_unit_sphere();
+            test.scattered = Ray::new(hit_record.p, target - hit_record.p);
+            test.attenuation = Vec3::new(0.5, 0.1, 0.1);
             return true;
         }
 
         fn metal(self) -> bool {
+            return true;
+        }
+
+        fn dielectric(self) -> bool {
             return true;
         }
     }

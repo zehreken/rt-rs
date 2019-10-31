@@ -48,4 +48,19 @@ pub mod ray {
             return self.from + self.to * t;
         }
     }
+
+    #[derive(Debug, Copy, Clone)]
+    pub struct Test {
+        pub scattered: Ray,
+        pub attenuation: Vec3,
+    }
+
+    impl Test {
+        pub fn new(scattered: Ray, attenuation: Vec3) -> Test {
+            Test {
+                scattered: scattered,
+                attenuation: attenuation,
+            }
+        }
+    }
 }

@@ -21,7 +21,8 @@ fn main() {
 
     let camera = Camera::new();
     let mut objects: Vec<Sphere> = Vec::new();
-    objects.push(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, 0));
+    objects.push(Sphere::new(Vec3::new(0.5, 0.0, -1.0), 0.5, 0));
+    objects.push(Sphere::new(Vec3::new(-0.5, 0.0, -1.0), 0.5, 0));
 
     objects.push(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, 0));
     // objects.push(Sphere::new(Vec3::new(0.0, -1000.5, -1.0), 1000.0)); This causes a weird glitch
@@ -33,7 +34,7 @@ fn main() {
             let u: f32 = (x as f32 + rng.gen::<f32>()) / WIDTH as f32;
             let v: f32 = ((HEIGHT - y) as f32 + rng.gen::<f32>()) / HEIGHT as f32; // invert y
             let ray = camera.get_ray(u, v);
-            col = col + color(ray, &objects);
+            col = col + color(ray, &objects, 0);
         }
 
         col = col / SAMPLE as f32;
@@ -48,22 +49,35 @@ fn main() {
     img_buf.save("out/basic.png").unwrap();
 }
 
-fn color(ray: Ray, objects: &[Sphere]) -> Vec3 {
+fn color(ray: Ray, objects: &[Sphere], depth: u32) -> Vec3 {
     let mut hit_record: HitRecord = HitRecord::new();
     let mut has_hit = false;
     let t_min: f32 = 0.0;
     let mut closest_so_far: f32 = std::f32::MAX;
+    let mut temp_obj = Sphere::new(Vec3::zero(), 0.0, 0);
 
     for obj in objects {
         if obj.hit(ray, t_min, closest_so_far, &mut hit_record) {
             has_hit = true;
             closest_so_far = hit_record.t;
+            temp_obj = *obj;
         }
     }
 
     if has_hit {
-        let target: Vec3 = hit_record.p + hit_record.normal + random_in_unit_sphere();
-        return 0.5 * color(Ray::new(hit_record.p, target - hit_record.p), objects);
+        // let target: Vec3 = hit_record.p + hit_record.normal + random_in_unit_sphere();
+        // return 0.5
+        //     * color(
+        //         Ray::new(hit_record.p, target - hit_record.p),
+        //         objects,
+        //         depth + 1,
+        //     );
+        let mut test:Test = Test::new(Ray::new(Vec3::zero(), Vec3::zero()), Vec3::zero());
+        if depth < 50 && temp_obj.scatter(ray, &mut hit_record, &mut test) {
+            return test.attenuation * color(test.scattered, objects, depth + 1);
+        } else {
+            return Vec3::zero();
+        }
     } else {
         let unit_direction: Vec3 = ray.direction().unit_vector();
         let t: f32 = 0.5 * (unit_direction.y() + 1.0);
