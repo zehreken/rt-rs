@@ -50,14 +50,14 @@ pub mod ray {
     }
 
     #[derive(Debug, Copy, Clone)]
-    pub struct Test {
+    pub struct ReflectRecord {
         pub scattered: Ray,
         pub attenuation: Vec3,
     }
 
-    impl Test {
-        pub fn new(scattered: Ray, attenuation: Vec3) -> Test {
-            Test {
+    impl ReflectRecord {
+        pub fn new(scattered: Ray, attenuation: Vec3) -> ReflectRecord {
+            ReflectRecord {
                 scattered: scattered,
                 attenuation: attenuation,
             }

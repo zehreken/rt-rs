@@ -8,9 +8,9 @@ pub mod sphere {
         fn hit(self, ray: Ray, t_min: f32, t_max: f32, hit_record: &mut HitRecord) -> bool;
         fn scatter(
             self,
-            ray: Ray,
+            // ray: Ray,
             hit_record: &mut HitRecord,
-            test: &mut Test,
+            reflect_record: &mut ReflectRecord,
         ) -> bool;
     }
 
@@ -59,12 +59,12 @@ pub mod sphere {
 
         fn scatter(
             self,
-            ray: Ray,
+            // ray: Ray,
             hit_record: &mut HitRecord,
-            test: &mut Test,
+            reflect_record: &mut ReflectRecord,
         ) -> bool {
             if self.material == 0 {
-                return self.lambertian(ray, hit_record, test);
+                return self.lambertian(hit_record, reflect_record);
             } else if self.material == 1 {
                 return self.metal();
             } else if self.material == 2 {
@@ -86,13 +86,13 @@ pub mod sphere {
 
         fn lambertian(
             self,
-            ray: Ray,
+            // ray: Ray,
             hit_record: &mut HitRecord,
-            test: &mut Test,
+            reflect_record: &mut ReflectRecord,
         ) -> bool {
             let target = hit_record.p + hit_record.normal + random_in_unit_sphere();
-            test.scattered = Ray::new(hit_record.p, target - hit_record.p);
-            test.attenuation = Vec3::new(0.5, 0.1, 0.1);
+            reflect_record.scattered = Ray::new(hit_record.p, target - hit_record.p);
+            reflect_record.attenuation = Vec3::new(0.5, 0.1, 0.1);
             return true;
         }
 

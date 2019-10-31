@@ -10,7 +10,6 @@ use crate::sphere::sphere::*;
 mod camera;
 use crate::camera::camera::*;
 mod utility;
-use crate::utility::utility::*;
 
 pub const WIDTH: u32 = 800;
 pub const HEIGHT: u32 = 400;
@@ -49,7 +48,7 @@ fn main() {
     img_buf.save("out/basic.png").unwrap();
 }
 
-fn color(ray: Ray, objects: &[Sphere], depth: u32) -> Vec3 {
+fn color(ray: Ray, objects: &[Sphere], depth: u8) -> Vec3 {
     let mut hit_record: HitRecord = HitRecord::new();
     let mut has_hit = false;
     let t_min: f32 = 0.0;
@@ -72,9 +71,9 @@ fn color(ray: Ray, objects: &[Sphere], depth: u32) -> Vec3 {
         //         objects,
         //         depth + 1,
         //     );
-        let mut test:Test = Test::new(Ray::new(Vec3::zero(), Vec3::zero()), Vec3::zero());
-        if depth < 50 && temp_obj.scatter(ray, &mut hit_record, &mut test) {
-            return test.attenuation * color(test.scattered, objects, depth + 1);
+        let mut reflect_record:ReflectRecord = ReflectRecord::new(Ray::new(Vec3::zero(), Vec3::zero()), Vec3::zero());
+        if depth < 50 && temp_obj.scatter(&mut hit_record, &mut reflect_record) {
+            return reflect_record.attenuation * color(reflect_record.scattered, objects, depth + 1);
         } else {
             return Vec3::zero();
         }
