@@ -13,17 +13,43 @@ mod utility;
 
 pub const WIDTH: u32 = 800;
 pub const HEIGHT: u32 = 400;
-pub const SAMPLE: u32 = 10;
+pub const SAMPLE: u32 = 100;
 
 fn main() {
     let mut rng = rand::thread_rng();
 
     let camera = Camera::new();
     let mut objects: Vec<Sphere> = Vec::new();
-    objects.push(Sphere::new(Vec3::new(0.5, 0.0, -1.0), 0.5, 0, Vec3::new(0.5, 0.1, 0.1), 0.0));
-    objects.push(Sphere::new(Vec3::new(-0.5, 0.0, -1.0), 0.5, 1, Vec3::new(0.9, 0.9, 0.9), 0.2));
+    objects.push(Sphere::new(
+        Vec3::new(0.5, 0.0, -1.0),
+        0.5,
+        0, // lambertian
+        Vec3::new(0.5, 0.1, 0.1),
+        0.0,
+    ));
+    objects.push(Sphere::new(
+        Vec3::new(-0.5, 0.0, -1.0),
+        0.5,
+        1, // metal
+        Vec3::new(0.9, 0.9, 0.9),
+        0.2,
+    ));
+    objects.push(Sphere::new(
+        Vec3::new(0.0, -0.25, -0.5),
+        0.25,
+        2, // dielectric
+        Vec3::new(0.1, 0.5, 0.1),
+        0.2,
+    ));
 
-    objects.push(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, 0, Vec3::new(0.1, 0.1, 0.5), 0.0));
+    objects.push(Sphere::new(
+        Vec3::new(0.0, -100.5, -1.0),
+        100.0,
+        0,
+        Vec3::new(0.1, 0.1, 0.5),
+        0.0,
+    ));
+
     // objects.push(Sphere::new(Vec3::new(0.0, -1000.5, -1.0), 1000.0)); This causes a weird glitch
 
     let mut img_buf = image::ImageBuffer::new(WIDTH, HEIGHT);

@@ -18,4 +18,41 @@ pub mod utility {
         // n = unit vector
         return v - 2.0 * Vec3::dot(v, n) * n;
     }
+
+    pub fn refract(v: Vec3, n: Vec3, ni_over_nt: f32, refracted: &mut Vec3) -> bool {
+        let uv: Vec3 = v.unit_vector();
+        let dt: f32 = Vec3::dot(uv, n);
+        let discriminant: f32 = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
+        if discriminant > 0.0 {
+            *refracted = ni_over_nt * (uv - dt * n) - discriminant.sqrt() * n;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /*
+        bool refract(const vec3& v, const vec3& n, float ni_over_nt, vec3& refracted)
+    {
+        vec3 uv = unit_vector(v);
+        float dt = dot(uv, n);
+        float discriminant = 1.0 - ni_over_nt * ni_over_nt * (1 - dt * dt);
+        if (discriminant > 0)
+        {
+            refracted = ni_over_nt * (uv - dt * n) - sqrt(discriminant) * n;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    */
+
+    pub fn schlick(cosine: f32, ref_idx: f32) -> f32 {
+        let mut r0: f32 = (1.0 - ref_idx) / (1.0 + ref_idx);
+        r0 = r0 * r0;
+
+        return r0 + (1.0 - r0) * (1.0 - cosine).powi(5);
+    }
 }
