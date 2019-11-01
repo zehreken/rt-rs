@@ -20,10 +20,10 @@ fn main() {
 
     let camera = Camera::new();
     let mut objects: Vec<Sphere> = Vec::new();
-    objects.push(Sphere::new(Vec3::new(0.5, 0.0, -1.0), 0.5, 0));
-    objects.push(Sphere::new(Vec3::new(-0.5, 0.0, -1.0), 0.5, 1));
+    objects.push(Sphere::new(Vec3::new(0.5, 0.0, -1.0), 0.5, 0, Vec3::new(0.5, 0.1, 0.1)));
+    objects.push(Sphere::new(Vec3::new(-0.5, 0.0, -1.0), 0.5, 1, Vec3::new(0.9, 0.9, 0.9)));
 
-    objects.push(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, 0));
+    objects.push(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, 0, Vec3::new(0.1, 0.1, 0.5)));
     // objects.push(Sphere::new(Vec3::new(0.0, -1000.5, -1.0), 1000.0)); This causes a weird glitch
 
     let mut img_buf = image::ImageBuffer::new(WIDTH, HEIGHT);
@@ -53,7 +53,7 @@ fn color(ray: Ray, objects: &[Sphere], depth: u8) -> Vec3 {
     let mut has_hit = false;
     let t_min: f32 = 0.0;
     let mut closest_so_far: f32 = std::f32::MAX;
-    let mut temp_obj = Sphere::new(Vec3::zero(), 0.0, 0);
+    let mut temp_obj = Sphere::new(Vec3::zero(), 0.0, 0, Vec3::zero());
 
     for obj in objects {
         if obj.hit(ray, t_min, closest_so_far, &mut hit_record) {
