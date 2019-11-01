@@ -8,7 +8,7 @@ pub mod sphere {
         fn hit(self, ray: Ray, t_min: f32, t_max: f32, hit_record: &mut HitRecord) -> bool;
         fn scatter(
             self,
-            // ray: Ray,
+            ray: Ray,
             hit_record: &mut HitRecord,
             reflect_record: &mut ReflectRecord,
         ) -> bool;
@@ -59,18 +59,18 @@ pub mod sphere {
 
         fn scatter(
             self,
-            // ray: Ray,
+            ray: Ray,
             hit_record: &mut HitRecord,
             reflect_record: &mut ReflectRecord,
         ) -> bool {
             if self.material == 0 {
                 return self.lambertian(hit_record, reflect_record);
             } else if self.material == 1 {
-                return self.metal();
+                return self.metal(ray, hit_record, reflect_record);
             } else if self.material == 2 {
                 return self.dielectric();
             } else {
-                return self.metal(); // default is lambertian
+                return self.dielectric(); // default is lambertian
             }
         }
     }
@@ -96,8 +96,12 @@ pub mod sphere {
             return true;
         }
 
-        fn metal(self) -> bool {
-            return true;
+        fn metal(self, ray: Ray, hit_record: &mut HitRecord, reflect_record: &mut ReflectRecord) -> bool {
+            let reflected = reflect(ray.direction().unit_vector(), hit_record.normal);
+            reflect_record.scattered = Ray::new(hit_record.p, reflected);
+            reflect_record.attenuation = Vec3::new(0.5, 0.1, 0.1);
+
+            return Vec3::dot(reflect_record.scattered.direction(), hit_record.normal) > 0.0;
         }
 
         fn dielectric(self) -> bool {

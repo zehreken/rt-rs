@@ -21,7 +21,7 @@ fn main() {
     let camera = Camera::new();
     let mut objects: Vec<Sphere> = Vec::new();
     objects.push(Sphere::new(Vec3::new(0.5, 0.0, -1.0), 0.5, 0));
-    objects.push(Sphere::new(Vec3::new(-0.5, 0.0, -1.0), 0.5, 0));
+    objects.push(Sphere::new(Vec3::new(-0.5, 0.0, -1.0), 0.5, 1));
 
     objects.push(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, 0));
     // objects.push(Sphere::new(Vec3::new(0.0, -1000.5, -1.0), 1000.0)); This causes a weird glitch
@@ -71,9 +71,11 @@ fn color(ray: Ray, objects: &[Sphere], depth: u8) -> Vec3 {
         //         objects,
         //         depth + 1,
         //     );
-        let mut reflect_record:ReflectRecord = ReflectRecord::new(Ray::new(Vec3::zero(), Vec3::zero()), Vec3::zero());
-        if depth < 50 && temp_obj.scatter(&mut hit_record, &mut reflect_record) {
-            return reflect_record.attenuation * color(reflect_record.scattered, objects, depth + 1);
+        let mut reflect_record: ReflectRecord =
+            ReflectRecord::new(Ray::new(Vec3::zero(), Vec3::zero()), Vec3::zero());
+        if depth < 50 && temp_obj.scatter(ray, &mut hit_record, &mut reflect_record) {
+            return reflect_record.attenuation
+                * color(reflect_record.scattered, objects, depth + 1);
         } else {
             return Vec3::zero();
         }
