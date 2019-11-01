@@ -20,6 +20,7 @@ pub mod sphere {
         radius: f32,
         material: u8,
         color: Vec3,
+        fuzz: f32, // only used for metal
     }
 
     impl fmt::Display for Sphere {
@@ -77,12 +78,13 @@ pub mod sphere {
     }
 
     impl Sphere {
-        pub fn new(center: Vec3, radius: f32, material: u8, color: Vec3) -> Sphere {
+        pub fn new(center: Vec3, radius: f32, material: u8, color: Vec3, fuzz: f32) -> Sphere {
             Sphere {
                 center: center,
                 radius: radius,
                 material: material,
                 color: color,
+                fuzz: fuzz,
             }
         }
 
@@ -100,7 +102,7 @@ pub mod sphere {
 
         fn metal(self, ray: Ray, hit_record: &mut HitRecord, reflect_record: &mut ReflectRecord) -> bool {
             let reflected = reflect(ray.direction().unit_vector(), hit_record.normal);
-            reflect_record.scattered = Ray::new(hit_record.p, reflected + 0.5 * random_in_unit_sphere());
+            reflect_record.scattered = Ray::new(hit_record.p, reflected + self.fuzz * random_in_unit_sphere());
             reflect_record.attenuation = self.color;
 
             return Vec3::dot(reflect_record.scattered.direction(), hit_record.normal) > 0.0;
