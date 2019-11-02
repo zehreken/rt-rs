@@ -18,7 +18,7 @@ pub const SAMPLE: u32 = 10;
 fn main() {
     let mut rng = rand::thread_rng();
 
-    let camera = Camera::new();
+    let camera = Camera::get_camera();
     let mut objects: Vec<Sphere> = Vec::new();
     objects.push(Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
