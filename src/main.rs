@@ -11,14 +11,14 @@ mod camera;
 use crate::camera::camera::*;
 mod utility;
 
-pub const WIDTH: u32 = 800;
-pub const HEIGHT: u32 = 400;
+pub const WIDTH: u32 = 1080 / 1;
+pub const HEIGHT: u32 = 1920 / 1;
 pub const SAMPLE: u32 = 10;
 
 fn main() {
     let mut rng = rand::thread_rng();
 
-    let camera = Camera::get_camera();
+    let camera = Camera::get_camera(WIDTH, HEIGHT);
     let mut objects: Vec<Sphere> = Vec::new();
     objects.push(Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
@@ -70,6 +70,8 @@ fn main() {
             (col.g() * 255.0) as u8,
             (col.b() * 255.0) as u8,
         ]);
+
+        // println!("{} / {}", x * HEIGHT, WIDTH * HEIGHT);
     }
     img_buf.save("out/basic.png").unwrap();
 }
@@ -90,13 +92,6 @@ fn color(ray: Ray, objects: &[Sphere], depth: u8) -> Vec3 {
     }
 
     if has_hit {
-        // let target: Vec3 = hit_record.p + hit_record.normal + random_in_unit_sphere();
-        // return 0.5
-        //     * color(
-        //         Ray::new(hit_record.p, target - hit_record.p),
-        //         objects,
-        //         depth + 1,
-        //     );
         let mut reflect_record: ReflectRecord =
             ReflectRecord::new(Ray::new(Vec3::zero(), Vec3::zero()), Vec3::zero());
         if depth < 50 && temp_obj.scatter(ray, &mut hit_record, &mut reflect_record) {
