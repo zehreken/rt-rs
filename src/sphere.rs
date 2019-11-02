@@ -143,10 +143,16 @@ pub mod sphere {
 
             if refract(ray.direction(), outward_normal, ni_over_nt, &mut refracted) {
                 reflect_prob = schlick(cosine, ref_idx);
-                reflect_record.scattered = Ray::new(hit_record.p, reflected); 
+            // reflect_record.scattered = Ray::new(hit_record.p, reflected);
             } else {
-                reflect_record.scattered = Ray::new(hit_record.p, reflected);
+                // reflect_record.scattered = Ray::new(hit_record.p, reflected);
                 reflect_prob = 1.0;
+            }
+
+            if get_random() < reflect_prob {
+                reflect_record.scattered = Ray::new(hit_record.p, reflected);
+            } else {
+                reflect_record.scattered = Ray::new(hit_record.p, refracted);
             }
 
             return true;
