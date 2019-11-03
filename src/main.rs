@@ -13,7 +13,7 @@ mod utility;
 
 pub const WIDTH: u32 = 800;
 pub const HEIGHT: u32 = 400;
-pub const SAMPLE: u32 = 100;
+pub const SAMPLE: u32 = 1;
 
 fn main() {
     let mut rng = rand::thread_rng();
