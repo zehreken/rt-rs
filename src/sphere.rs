@@ -126,7 +126,7 @@ pub mod sphere {
             let mut outward_normal: Vec3 = Vec3::zero();
             let reflected = reflect(ray.direction(), hit_record.normal);
             let ni_over_nt: f32;
-            reflect_record.attenuation = Vec3::new(1.0, 1.0, 1.0);
+            reflect_record.attenuation = self.color; // Vec3::new(1.0, 1.0, 1.0);
             let mut refracted: Vec3 = Vec3::zero();
             let reflect_prob: f32;
             let cosine: f32;
@@ -143,9 +143,7 @@ pub mod sphere {
 
             if refract(ray.direction(), outward_normal, ni_over_nt, &mut refracted) {
                 reflect_prob = schlick(cosine, ref_idx);
-            // reflect_record.scattered = Ray::new(hit_record.p, reflected);
             } else {
-                // reflect_record.scattered = Ray::new(hit_record.p, reflected);
                 reflect_prob = 1.0;
             }
 

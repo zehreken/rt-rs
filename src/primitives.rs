@@ -74,6 +74,10 @@ pub mod vec3 {
         pub fn unit_vector(self) -> Vec3 {
             return self / self.length();
         }
+
+        pub fn sqrt(self) -> Vec3 {
+            return Vec3::new(self.x.sqrt(), self.y.sqrt(), self.z.sqrt());
+        }
     }
 
     use std::ops;

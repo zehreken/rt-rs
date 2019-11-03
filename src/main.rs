@@ -11,9 +11,9 @@ mod camera;
 use crate::camera::camera::*;
 mod utility;
 
-pub const WIDTH: u32 = 1080 / 1;
-pub const HEIGHT: u32 = 1920 / 1;
-pub const SAMPLE: u32 = 10;
+pub const WIDTH: u32 = 800;
+pub const HEIGHT: u32 = 400;
+pub const SAMPLE: u32 = 100;
 
 fn main() {
     let mut rng = rand::thread_rng();
@@ -38,7 +38,14 @@ fn main() {
         Vec3::new(-1.0, -0.0, -1.0),
         0.5,
         2, // dielectric
-        Vec3::new(0.1, 0.5, 0.1),
+        Vec3::new(0.1, 0.5, 0.1).sqrt().sqrt().sqrt(),
+        0.2,
+    ));
+    objects.push(Sphere::new(
+        Vec3::new(0.0, 0.0, 1.0),
+        0.5,
+        2,
+        Vec3::new(0.5, 0.5, 0.3).sqrt().sqrt().sqrt(),
         0.2,
     ));
 
