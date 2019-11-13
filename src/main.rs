@@ -1,6 +1,11 @@
 extern crate image;
 extern crate rand;
 use rand::Rng;
+use sdl2::keyboard::Keycode;
+use sdl2::pixels::{Color, PixelFormatEnum};
+use sdl2::rect::Rect;
+use sdl2::render::*;
+use std::time::Duration;
 mod primitives;
 use crate::primitives::vec3::*;
 mod ray;
@@ -11,11 +16,40 @@ mod camera;
 use crate::camera::camera::*;
 mod utility;
 
-pub const WIDTH: u32 = 800;
-pub const HEIGHT: u32 = 400;
-pub const SAMPLE: u32 = 1;
+pub const WIDTH: u32 = 400;
+pub const HEIGHT: u32 = 200;
+pub const SAMPLE: u32 = 10;
 
 fn main() {
+    let sdl_context = sdl2::init().unwrap();
+    let video_subsystem = sdl_context.video().unwrap();
+
+    let window = video_subsystem
+        .window("rt_rs", WIDTH, HEIGHT)
+        .position_centered()
+        .build()
+        .unwrap();
+
+    let mut canvas = window.into_canvas().build().unwrap();
+    canvas.set_draw_color(Color::RGB(0, 0, 0));
+    canvas.clear();
+    canvas.present();
+
+    let texture_creator = canvas.texture_creator();
+    let mut framebuffer = texture_creator
+        .create_texture(PixelFormatEnum::RGB24, TextureAccess::Static, WIDTH, HEIGHT)
+        .unwrap();
+
+    const CHANNEL_COUNT: usize = 3;
+    let mut pixels: [u8; WIDTH as usize * HEIGHT as usize * CHANNEL_COUNT] =
+        [255; WIDTH as usize * HEIGHT as usize * CHANNEL_COUNT];
+    let mut offset: usize = 0;
+    framebuffer
+        .update(None, &pixels, WIDTH as usize * CHANNEL_COUNT)
+        .unwrap();
+    let mut colors: [Vec3; WIDTH as usize * HEIGHT as usize] =
+        [Vec3::zero(); WIDTH as usize * HEIGHT as usize];
+
     let mut rng = rand::thread_rng();
 
     let camera = Camera::get_camera(WIDTH, HEIGHT);
@@ -59,6 +93,76 @@ fn main() {
 
     // objects.push(Sphere::new(Vec3::new(0.0, -1000.5, -1.0), 1000.0)); This causes a weird glitch
 
+    let mut event_pump = sdl_context.event_pump().unwrap();
+
+    // for y in 0..HEIGHT {
+    //     for x in 0..WIDTH {
+    //         let index: usize = ((x + y * WIDTH as u32) * CHANNEL_COUNT as u32) as usize;
+    //         let u: f32 = (x as f32 + rng.gen::<f32>()) / WIDTH as f32;
+    //         let v: f32 = ((HEIGHT - y) as f32 + rng.gen::<f32>()) / HEIGHT as f32; // invert y
+    //         let ray = camera.get_ray(u, v);
+    //         colors[index] = colors[index] + color(ray, &objects, 0);
+
+    //         pixels[index] = (colors[index].r() * 255.0) as u8; //pixels[index] + (col.r() * 255.0) as u8) / 2;
+    //         pixels[index + 1] = (colors[index].g() * 255.0) as u8; //(pixels[index + 1] + (col.g() * 255.0) as u8) / 2;
+    //         pixels[index + 1] = (colors[index].b() * 255.0) as u8; //(pixels[index + 2] + (col.b() * 255.0) as u8) / 2;
+    //     }
+    // }
+
+    let mut sample_count: f32 = 1.0; // This is a divider, can't be zero
+    'running: loop {
+        for event in event_pump.poll_iter() {
+            match event {
+                sdl2::event::Event::Quit { .. } => break 'running,
+                sdl2::event::Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => break 'running,
+                _ => {}
+            }
+        }
+
+        for y in 0..HEIGHT {
+            for x in 0..WIDTH {
+                let color_index = (x + y * WIDTH as u32) as usize;
+                let index: usize = ((x + y * WIDTH as u32) * CHANNEL_COUNT as u32) as usize;
+                let u: f32 = (x as f32 + rng.gen::<f32>()) / WIDTH as f32;
+                let v: f32 = ((HEIGHT - y) as f32 + rng.gen::<f32>()) / HEIGHT as f32; // invert y
+                let ray = camera.get_ray(u, v);
+                colors[color_index] = colors[color_index] + color(ray, &objects, 0);
+
+                let r = (colors[color_index].r() / sample_count).sqrt();
+                let g = (colors[color_index].g() / sample_count).sqrt();
+                let b = (colors[color_index].b() / sample_count).sqrt();
+                pixels[index] = (r * 255.0) as u8;
+                pixels[index + 1] = (g * 255.0) as u8;
+                pixels[index + 2] = (b * 255.0) as u8;
+            }
+        }
+
+        sample_count += 1.0;
+
+        // let state = event_pump.mouse_state();
+        // println!("mouse x: {}, y: {}", state.x(), state.y());
+        // let point: usize = ((state.x() + state.y() * WIDTH as i32) * CHANNEL_COUNT as i32) as usize;
+        // pixels[point] = 0;
+        // pixels[point + 1] = 0;
+        // pixels[point + 2] = 0;
+        framebuffer
+            .update(None, &pixels, WIDTH as usize * CHANNEL_COUNT)
+            .unwrap();
+
+        canvas
+            .copy(&framebuffer, None, Rect::new(0, 0, WIDTH, HEIGHT))
+            .unwrap();
+
+        canvas.present();
+        canvas.clear();
+
+        std::thread::sleep(Duration::from_millis(20));
+    }
+
+    return;
     let mut img_buf = image::ImageBuffer::new(WIDTH, HEIGHT);
     for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
         let mut col = Vec3::zero();
