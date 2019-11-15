@@ -17,7 +17,7 @@ use crate::camera::camera::*;
 mod utility;
 
 pub const WIDTH: u32 = 400;
-pub const HEIGHT: u32 = 200;
+pub const HEIGHT: u32 = 300;
 pub const SAMPLE: u32 = 10;
 
 fn main() {
