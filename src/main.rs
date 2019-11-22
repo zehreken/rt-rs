@@ -5,7 +5,7 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::{Color, PixelFormatEnum};
 use sdl2::rect::Rect;
 use sdl2::render::*;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 mod primitives;
 use crate::primitives::vec3::*;
 mod ray;
@@ -14,10 +14,12 @@ mod sphere;
 use crate::sphere::sphere::*;
 mod camera;
 use crate::camera::camera::*;
+mod fps_utils;
 mod utility;
+use crate::fps_utils::fps_utils::*;
 
-pub const WIDTH: u32 = 400;
-pub const HEIGHT: u32 = 300;
+pub const WIDTH: u32 = 200;
+pub const HEIGHT: u32 = 150;
 pub const SAMPLE: u32 = 10;
 
 fn main() {
@@ -109,6 +111,10 @@ fn main() {
     //     }
     // }
 
+    let mut fps_counter = FpsCounter::new();
+    let mut now = Instant::now();
+    let mut fps_counts = Vec::new();
+
     let mut sample_count: f32 = 1.0; // This is a divider, can't be zero
     'running: loop {
         for event in event_pump.poll_iter() {
@@ -159,8 +165,22 @@ fn main() {
         canvas.present();
         canvas.clear();
 
+        let duration: Duration = Instant::now() - now;
+        let fps_count = fps_counter.tick(duration.as_millis());
+        if (fps_count > 0) {
+            fps_counts.push(fps_count);
+        }
+        now = Instant::now();
+
         std::thread::sleep(Duration::from_millis(20));
     }
+
+    let mut fps_sum = 0;
+    for i in &fps_counts {
+        fps_sum += i;
+    }
+    let average_fps = fps_sum as f32 / fps_counts.len() as f32;
+    println!("Average fps: {}", average_fps);
 
     return;
     let mut img_buf = image::ImageBuffer::new(WIDTH, HEIGHT);
