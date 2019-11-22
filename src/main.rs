@@ -54,7 +54,7 @@ fn main() {
 
     let mut rng = rand::thread_rng();
 
-    let camera = Camera::get_camera(WIDTH, HEIGHT);
+    let mut camera = Camera::get_camera(WIDTH, HEIGHT);
     let mut objects: Vec<Sphere> = Vec::new();
     objects.push(Sphere::new(
         Vec3::new(0.0, 0.0, -1.0),
@@ -128,6 +128,8 @@ fn main() {
             }
         }
 
+        camera.translate(Vec3::new(0.0, 0.0, -0.01));
+
         for y in 0..HEIGHT {
             for x in 0..WIDTH {
                 let color_index = (x + y * WIDTH as u32) as usize;
@@ -167,7 +169,7 @@ fn main() {
 
         let duration: Duration = Instant::now() - now;
         let fps_count = fps_counter.tick(duration.as_millis());
-        if (fps_count > 0) {
+        if fps_count > 0 {
             fps_counts.push(fps_count);
         }
         now = Instant::now();

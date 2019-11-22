@@ -87,5 +87,29 @@ pub mod camera {
                     - offset,
             );
         }
+
+        pub fn translate(&mut self, delta: Vec3) {
+            self.origin = self.origin + delta;
+            let look_at: Vec3 = Vec3::new(0.0, 0.0, -1.0);
+            let v_up: Vec3 = Vec3::new(0.0, 1.0, 0.0);
+            let v_fov: f32 = 60.0;
+            let aspect: f32 = 300 as f32 / 150 as f32;
+            let aperture: f32 = 0.1;
+            let focus_dist: f32 = (self.origin - look_at).length();
+
+            self.lens_radius = aperture / 2.0;
+            let theta: f32 = v_fov * PI / 180.0;
+            let half_height: f32 = (theta / 2.0).tan();
+            let half_width = aspect * half_height;
+            self.w = (self.origin - look_at).unit_vector();
+            self.u = Vec3::cross(v_up, self.w).unit_vector();
+            self.v = Vec3::cross(self.w, self.u);
+            self.lower_left_corner = self.origin
+                - half_width * focus_dist * self.u
+                - half_height * focus_dist * self.v
+                - focus_dist * self.w;
+            self.horizontal = 2.0 * half_width * focus_dist * self.u;
+            self.vertical = 2.0 * half_height * focus_dist * self.v;
+        }
     }
 }
