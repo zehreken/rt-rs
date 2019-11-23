@@ -5,6 +5,7 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::{Color, PixelFormatEnum};
 use sdl2::rect::Rect;
 use sdl2::render::*;
+use std::thread;
 use std::time::{Duration, Instant};
 mod primitives;
 use crate::primitives::vec3::*;
@@ -18,8 +19,8 @@ mod fps_utils;
 mod utility;
 use crate::fps_utils::fps_utils::*;
 
-pub const WIDTH: u32 = 200;
-pub const HEIGHT: u32 = 150;
+pub const WIDTH: u32 = 300;
+pub const HEIGHT: u32 = 200;
 pub const SAMPLE: u32 = 10;
 
 fn main() {
@@ -71,16 +72,16 @@ fn main() {
         0.2,
     ));
     objects.push(Sphere::new(
-        Vec3::new(-1.0, -0.0, -1.0),
+        Vec3::new(-1.5, -0.0, -1.0),
         0.5,
         2, // dielectric
-        Vec3::new(0.1, 0.5, 0.1).sqrt().sqrt().sqrt(),
+        Vec3::new(0.9, 0.9, 0.9).sqrt().sqrt().sqrt(),
         0.2,
     ));
     objects.push(Sphere::new(
-        Vec3::new(0.0, 0.0, 1.0),
+        Vec3::new(0.0, 0.0, -4.0),
         0.5,
-        2,
+        1,
         Vec3::new(0.5, 0.5, 0.3).sqrt().sqrt().sqrt(),
         0.2,
     ));
@@ -128,7 +129,7 @@ fn main() {
             }
         }
 
-        camera.translate(Vec3::new(0.0, 0.0, -0.01));
+        camera.translate(Vec3::new(-0.007, 0.0, -0.005));
 
         for y in 0..HEIGHT {
             for x in 0..WIDTH {
@@ -137,11 +138,11 @@ fn main() {
                 let u: f32 = (x as f32 + rng.gen::<f32>()) / WIDTH as f32;
                 let v: f32 = ((HEIGHT - y) as f32 + rng.gen::<f32>()) / HEIGHT as f32; // invert y
                 let ray = camera.get_ray(u, v);
-                colors[color_index] = colors[color_index] + color(ray, &objects, 0);
+                colors[color_index] = color(ray, &objects, 0);
 
-                let r = (colors[color_index].r() / sample_count).sqrt();
-                let g = (colors[color_index].g() / sample_count).sqrt();
-                let b = (colors[color_index].b() / sample_count).sqrt();
+                let r = (colors[color_index].r() / 1.0).sqrt();
+                let g = (colors[color_index].g() / 1.0).sqrt();
+                let b = (colors[color_index].b() / 1.0).sqrt();
                 pixels[index] = (r * 255.0) as u8;
                 pixels[index + 1] = (g * 255.0) as u8;
                 pixels[index + 2] = (b * 255.0) as u8;
@@ -174,7 +175,7 @@ fn main() {
         }
         now = Instant::now();
 
-        std::thread::sleep(Duration::from_millis(20));
+        std::thread::sleep(Duration::from_millis(0));
     }
 
     let mut fps_sum = 0;
