@@ -27,7 +27,7 @@ fn main() {
     let video_subsystem = sdl_context.video().unwrap();
 
     let window = video_subsystem
-        .window("rt_rs", WIDTH, HEIGHT)
+        .window("rt-rs", WIDTH, HEIGHT)
         .position_centered()
         .build()
         .unwrap();
@@ -137,7 +137,7 @@ fn main() {
                 let u: f32 = (x as f32 + rng.gen::<f32>()) / WIDTH as f32;
                 let v: f32 = ((HEIGHT - y) as f32 + rng.gen::<f32>()) / HEIGHT as f32; // invert y
                 let ray = camera.get_ray(u, v);
-                colors[color_index] = colors[color_index] + color(ray, &objects, 0);
+                colors[color_index] = color(ray, &objects, 0);
 
                 let r = (colors[color_index].r() / sample_count).sqrt();
                 let g = (colors[color_index].g() / sample_count).sqrt();
@@ -148,7 +148,7 @@ fn main() {
             }
         }
 
-        sample_count += 1.0;
+        // sample_count += 1.0;
 
         // let state = event_pump.mouse_state();
         // println!("mouse x: {}, y: {}", state.x(), state.y());
