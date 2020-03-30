@@ -1,20 +1,15 @@
 extern crate image;
 extern crate rand;
-use rand::Rng;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::{Color, PixelFormatEnum};
 use sdl2::rect::Rect;
 use sdl2::render::*;
 use std::time::{Duration, Instant};
-mod primitives;
-use crate::primitives::vec3::*;
-mod ray;
-use crate::ray::ray::*;
-mod sphere;
-use crate::sphere::sphere::*;
 mod camera;
-use crate::camera::camera::*;
 mod fps_utils;
+mod primitives;
+mod ray;
+mod sphere;
 mod utility;
 use crate::fps_utils::fps_utils::*;
 mod tracer;
@@ -24,6 +19,9 @@ pub const HEIGHT: u32 = 150;
 pub const SAMPLE: u32 = 10;
 
 fn main() {
+    tracer::save_image(640, 480, 5);
+    return;
+
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
@@ -140,62 +138,4 @@ fn main() {
     }
     let average_fps = fps_sum as f32 / fps_counts.len() as f32;
     println!("Average fps: {}", average_fps);
-
-    return;
-    /*
-    let mut img_buf = image::ImageBuffer::new(WIDTH, HEIGHT);
-    for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
-        let mut col = Vec3::zero();
-        for _z in 0..SAMPLE {
-            let u: f32 = (x as f32 + rng.gen::<f32>()) / WIDTH as f32;
-            let v: f32 = ((HEIGHT - y) as f32 + rng.gen::<f32>()) / HEIGHT as f32; // invert y
-            let ray = camera.get_ray(u, v);
-            col = col + color(ray, &objects, 0);
-        }
-
-        col = col / SAMPLE as f32;
-        col = Vec3::new(col.r().sqrt(), col.g().sqrt(), col.b().sqrt()); // Gamma correction
-
-        *pixel = image::Rgb([
-            (col.r() * 255.0) as u8,
-            (col.g() * 255.0) as u8,
-            (col.b() * 255.0) as u8,
-        ]);
-
-        // println!("{} / {}", x * HEIGHT, WIDTH * HEIGHT);
-    }
-    img_buf.save("out/basic.png").unwrap();
-    */
-}
-
-fn color(ray: Ray, objects: &[Sphere], depth: u8) -> Vec3 {
-    let mut hit_record: HitRecord = HitRecord::new();
-    let mut has_hit = false;
-    let t_min: f32 = 0.0;
-    let mut closest_so_far: f32 = std::f32::MAX;
-    let mut temp_obj = Sphere::new(Vec3::zero(), 0.0, 0, Vec3::zero(), 0.0);
-
-    for obj in objects {
-        if obj.hit(ray, t_min, closest_so_far, &mut hit_record) {
-            has_hit = true;
-            closest_so_far = hit_record.t;
-            temp_obj = *obj;
-        }
-    }
-
-    if has_hit {
-        let mut reflect_record: ReflectRecord =
-            ReflectRecord::new(Ray::new(Vec3::zero(), Vec3::zero()), Vec3::zero());
-        if depth < 50 && temp_obj.scatter(ray, &mut hit_record, &mut reflect_record) {
-            return reflect_record.attenuation
-                * color(reflect_record.scattered, objects, depth + 1);
-        } else {
-            return Vec3::zero();
-        }
-    } else {
-        let unit_direction: Vec3 = ray.direction().unit_vector();
-        let t: f32 = 0.5 * (unit_direction.y() + 1.0);
-
-        return (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0);
-    }
 }
