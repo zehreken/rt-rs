@@ -52,6 +52,7 @@ pub fn create_scene(width: u32, height: u32, channel_count: usize) -> Scene {
         Vec3::new(0.1, 0.1, 0.5),
         0.0,
     ));
+    // objects.push(Sphere::new(Vec3::new(0.0, -1000.5, -1.0), 1000.0)); // This causes a weird glitch
 
     Scene {
         camera,

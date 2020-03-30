@@ -46,56 +46,10 @@ fn main() {
         .unwrap();
 
     const CHANNEL_COUNT: usize = 3;
-    let mut pixels: [u8; WIDTH as usize * HEIGHT as usize * CHANNEL_COUNT] =
-        [255; WIDTH as usize * HEIGHT as usize * CHANNEL_COUNT];
     let mut offset: usize = 0;
     framebuffer
-        .update(None, &pixels, WIDTH as usize * CHANNEL_COUNT)
+        .update(None, &scene.pixels, WIDTH as usize * CHANNEL_COUNT)
         .unwrap();
-    let mut colors: [Vec3; WIDTH as usize * HEIGHT as usize] =
-        [Vec3::zero(); WIDTH as usize * HEIGHT as usize];
-
-    let mut rng = rand::thread_rng();
-
-    let mut camera = Camera::get_camera(WIDTH, HEIGHT);
-    let mut objects: Vec<Sphere> = Vec::new();
-    objects.push(Sphere::new(
-        Vec3::new(0.0, 0.0, -1.0),
-        0.5,
-        0, // lambertian
-        Vec3::new(0.5, 0.1, 0.1),
-        0.0,
-    ));
-    objects.push(Sphere::new(
-        Vec3::new(1.0, 0.0, -1.0),
-        0.5,
-        1, // metal
-        Vec3::new(0.9, 0.9, 0.9),
-        0.2,
-    ));
-    objects.push(Sphere::new(
-        Vec3::new(-1.0, -0.0, -1.0),
-        0.5,
-        2, // dielectric
-        Vec3::new(0.1, 0.5, 0.1).sqrt().sqrt().sqrt(),
-        0.2,
-    ));
-    objects.push(Sphere::new(
-        Vec3::new(0.0, 0.0, 1.0),
-        0.5,
-        2,
-        Vec3::new(0.5, 0.5, 0.3).sqrt().sqrt().sqrt(),
-        0.2,
-    ));
-    objects.push(Sphere::new(
-        Vec3::new(0.0, -100.5, -1.0),
-        100.0,
-        0,
-        Vec3::new(0.1, 0.1, 0.5),
-        0.0,
-    ));
-
-    // objects.push(Sphere::new(Vec3::new(0.0, -1000.5, -1.0), 1000.0)); This causes a weird glitch
 
     let mut event_pump = sdl_context.event_pump().unwrap();
 
@@ -188,6 +142,7 @@ fn main() {
     println!("Average fps: {}", average_fps);
 
     return;
+    /*
     let mut img_buf = image::ImageBuffer::new(WIDTH, HEIGHT);
     for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
         let mut col = Vec3::zero();
@@ -210,6 +165,7 @@ fn main() {
         // println!("{} / {}", x * HEIGHT, WIDTH * HEIGHT);
     }
     img_buf.save("out/basic.png").unwrap();
+    */
 }
 
 fn color(ray: Ray, objects: &[Sphere], depth: u8) -> Vec3 {
