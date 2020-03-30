@@ -17,6 +17,7 @@ use crate::camera::camera::*;
 mod fps_utils;
 mod utility;
 use crate::fps_utils::fps_utils::*;
+mod tracer;
 
 pub const WIDTH: u32 = 200;
 pub const HEIGHT: u32 = 150;
@@ -31,6 +32,8 @@ fn main() {
         .position_centered()
         .build()
         .unwrap();
+
+    let mut scene = tracer::create_scene(WIDTH, HEIGHT, 3);
 
     let mut canvas = window.into_canvas().build().unwrap();
     canvas.set_draw_color(Color::RGB(0, 0, 0));
@@ -84,7 +87,6 @@ fn main() {
         Vec3::new(0.5, 0.5, 0.3).sqrt().sqrt().sqrt(),
         0.2,
     ));
-
     objects.push(Sphere::new(
         Vec3::new(0.0, -100.5, -1.0),
         100.0,
@@ -128,25 +130,26 @@ fn main() {
             }
         }
 
-        camera.translate(Vec3::new(0.0, 0.0, -0.01));
+        tracer::update(&mut scene);
+        // camera.translate(Vec3::new(0.0, 0.0, -0.01));
 
-        for y in 0..HEIGHT {
-            for x in 0..WIDTH {
-                let color_index = (x + y * WIDTH as u32) as usize;
-                let index: usize = ((x + y * WIDTH as u32) * CHANNEL_COUNT as u32) as usize;
-                let u: f32 = (x as f32 + rng.gen::<f32>()) / WIDTH as f32;
-                let v: f32 = ((HEIGHT - y) as f32 + rng.gen::<f32>()) / HEIGHT as f32; // invert y
-                let ray = camera.get_ray(u, v);
-                colors[color_index] = color(ray, &objects, 0);
+        // for y in 0..HEIGHT {
+        //     for x in 0..WIDTH {
+        //         let color_index = (x + y * WIDTH as u32) as usize;
+        //         let index: usize = ((x + y * WIDTH as u32) * CHANNEL_COUNT as u32) as usize;
+        //         let u: f32 = (x as f32 + rng.gen::<f32>()) / WIDTH as f32;
+        //         let v: f32 = ((HEIGHT - y) as f32 + rng.gen::<f32>()) / HEIGHT as f32; // invert y
+        //         let ray = camera.get_ray(u, v);
+        //         colors[color_index] = color(ray, &objects, 0);
 
-                let r = (colors[color_index].r() / sample_count).sqrt();
-                let g = (colors[color_index].g() / sample_count).sqrt();
-                let b = (colors[color_index].b() / sample_count).sqrt();
-                pixels[index] = (r * 255.0) as u8;
-                pixels[index + 1] = (g * 255.0) as u8;
-                pixels[index + 2] = (b * 255.0) as u8;
-            }
-        }
+        //         let r = (colors[color_index].r() / sample_count).sqrt();
+        //         let g = (colors[color_index].g() / sample_count).sqrt();
+        //         let b = (colors[color_index].b() / sample_count).sqrt();
+        //         pixels[index] = (r * 255.0) as u8;
+        //         pixels[index + 1] = (g * 255.0) as u8;
+        //         pixels[index + 2] = (b * 255.0) as u8;
+        //     }
+        // }
 
         // sample_count += 1.0;
 
@@ -157,7 +160,7 @@ fn main() {
         // pixels[point + 1] = 0;
         // pixels[point + 2] = 0;
         framebuffer
-            .update(None, &pixels, WIDTH as usize * CHANNEL_COUNT)
+            .update(None, &scene.pixels, WIDTH as usize * CHANNEL_COUNT)
             .unwrap();
 
         canvas
