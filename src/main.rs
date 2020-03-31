@@ -23,8 +23,8 @@ fn main() {
     let mut fps_counts = Vec::new();
 
     // tracer::save_image(640, 480, 5);
-    // trace_with_minifb(640, 480);
-    trace_with_sdl(200, 150);
+    trace_with_minifb(200, 150);
+    // trace_with_sdl(200, 150);
 
     let duration: Duration = Instant::now() - now;
     let fps_count = fps_counter.tick(duration.as_millis());
@@ -112,12 +112,20 @@ fn trace_with_minifb(width: usize, height: usize) {
         panic!("{}", e);
     });
 
+    let mut scene = tracer::create_scene(width as u32, height as u32, 3);
+
     // Limit to max ~60 fps update rate
     window.limit_update_rate(Some(std::time::Duration::from_micros(16600)));
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
+        tracer::update(&mut scene);
+        let mut index = 0;
         for i in buffer.iter_mut() {
-            *i = 0xff0055; // write someting more funny here!
+            let color: u32 = ((scene.pixels[index] as u32)
+                << 16) + ((scene.pixels[index + 1] as u32)
+                << 8) + (scene.pixels[index + 2] as u32);
+            *i = color;
+            index += 3;
         }
 
         // We unwrap here as we want this code to exit if it fails. Real applications may want to haneld this in a different way
