@@ -31,18 +31,18 @@ pub fn create_scene(width: u32, height: u32, channel_count: usize) -> Scene {
 
 pub fn update(scene: &mut Scene) {
     let mut rng = rand::thread_rng();
-    let WIDTH = scene.width;
-    let HEIGHT = scene.height;
-    let CHANNEL_COUNT = scene.channel_count;
+    let width = scene.width;
+    let height = scene.height;
+    let channel_count = scene.channel_count;
     let sample_count = 1.0;
 
     scene.camera.translate(Vec3::new(0.0, 0.0, -0.01));
-    for y in 0..HEIGHT {
-        for x in 0..WIDTH {
-            let color_index = (x + y * WIDTH as u32) as usize;
-            let index: usize = ((x + y * WIDTH as u32) * CHANNEL_COUNT as u32) as usize;
-            let u: f32 = (x as f32 + rng.gen::<f32>()) / WIDTH as f32;
-            let v: f32 = ((HEIGHT - y) as f32 + rng.gen::<f32>()) / HEIGHT as f32; // invert y
+    for y in 0..height {
+        for x in 0..width {
+            let color_index = (x + y * width as u32) as usize;
+            let index: usize = ((x + y * width as u32) * channel_count as u32) as usize;
+            let u: f32 = (x as f32 + rng.gen::<f32>()) / width as f32;
+            let v: f32 = ((height - y) as f32 + rng.gen::<f32>()) / height as f32; // invert y
             let ray = scene.camera.get_ray(u, v);
             scene.colors[color_index] = color(ray, &scene.objects, 0);
 
