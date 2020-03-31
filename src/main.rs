@@ -13,13 +13,15 @@ mod sphere;
 mod utility;
 use crate::fps_utils::fps_utils::*;
 mod tracer;
+use minifb::{Key, Window, WindowOptions};
 
 pub const WIDTH: u32 = 200;
 pub const HEIGHT: u32 = 150;
 pub const SAMPLE: u32 = 10;
 
 fn main() {
-    tracer::save_image(640, 480, 5);
+    // tracer::save_image(640, 480, 5);
+    trace_with_minifb(640, 480);
     return;
 
     let sdl_context = sdl2::init().unwrap();
@@ -138,4 +140,32 @@ fn main() {
     }
     let average_fps = fps_sum as f32 / fps_counts.len() as f32;
     println!("Average fps: {}", average_fps);
+}
+
+fn trace_with_sdl() {}
+
+fn trace_with_minifb(width: usize, height: usize) {
+    let mut buffer: Vec<u32> = vec![0; width * height];
+
+    let mut window = Window::new(
+        "Test - ESC to exit",
+        width,
+        height,
+        WindowOptions::default(),
+    )
+    .unwrap_or_else(|e| {
+        panic!("{}", e);
+    });
+
+    // Limit to max ~60 fps update rate
+    window.limit_update_rate(Some(std::time::Duration::from_micros(16600)));
+
+    while window.is_open() && !window.is_key_down(Key::Escape) {
+        for i in buffer.iter_mut() {
+            *i = 0xff0055; // write someting more funny here!
+        }
+
+        // We unwrap here as we want this code to exit if it fails. Real applications may want to haneld this in a different way
+        window.update_with_buffer(&buffer, width, height).unwrap();
+    }
 }
