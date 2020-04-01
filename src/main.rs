@@ -14,16 +14,20 @@ mod utility;
 use crate::fps_utils::fps_utils::*;
 mod tracer;
 use minifb::{Key, Window, WindowOptions};
+mod thread_test;
 
 pub const SAMPLE: u32 = 10;
 
 fn main() {
+    thread_test::test_thread();
+    return;
+
     let mut fps_counter = FpsCounter::new();
     let mut now = Instant::now();
     let mut fps_counts = Vec::new();
 
     // tracer::save_image(640, 480, 5);
-    trace_with_minifb(200, 150);
+    // trace_with_minifb(200, 150);
     // trace_with_sdl(200, 150);
 
     let duration: Duration = Instant::now() - now;
