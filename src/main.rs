@@ -125,9 +125,9 @@ fn trace_with_minifb(width: usize, height: usize) {
         tracer::update(&mut scene);
         let mut index = 0;
         for i in buffer.iter_mut() {
-            let color: u32 = ((scene.pixels[index] as u32)
-                << 16) + ((scene.pixels[index + 1] as u32)
-                << 8) + (scene.pixels[index + 2] as u32);
+            let color: u32 = ((scene.pixels[index] as u32) << 16)
+                + ((scene.pixels[index + 1] as u32) << 8)
+                + (scene.pixels[index + 2] as u32);
             *i = color;
             index += 3;
         }
