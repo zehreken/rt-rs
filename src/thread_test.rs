@@ -4,36 +4,36 @@ use std::time::{Duration, Instant};
 const SIZE: usize = 10000;
 
 pub fn test_thread() {
-    let handle1 = thread::spawn(|| {
-        for i in 1..10 {
-            println!("hi number {} from 1", i);
-            thread::sleep(Duration::from_micros(1));
-        }
-    });
-
-    let handle2 = thread::spawn(|| {
-        for i in 1..20 {
-            println!("hi number {} from 2", i);
-            thread::sleep(Duration::from_micros(1));
-        }
-    });
-    handle2.join().unwrap();
-    handle1.join().unwrap();
-
-    for i in 1..5 {
-        println!("hi number {} from 0", i);
-        thread::sleep(Duration::from_micros(1));
-    }
-
     let mut a = [0u32; SIZE];
     for i in 0..SIZE {
         a[i] = (SIZE - i) as u32;
     }
 
+    let handle1 = thread::spawn(move || {
+        let mut _a = a.clone();
+        let now = Instant::now();
+        bubble_sort(&mut _a);
+        let then = Instant::now() - now;
+        println!("in {} ms", then.as_millis());
+    });
+
+    let handle2 = thread::spawn(move || {
+        let mut _a = a.clone();
+        let now = Instant::now();
+        bubble_sort(&mut _a);
+        let then = Instant::now() - now;
+        println!("in {} ms", then.as_millis());
+    });
+    // handle2.join().unwrap();
+    // handle1.join().unwrap();
+
+    let mut _a = a.clone();
+    let mut _b = a.clone();
     let now = Instant::now();
-    bubble_sort(&mut a);
+    bubble_sort(&mut _a);
+    bubble_sort(&mut _b);
     let then = Instant::now() - now;
-    println!("in {}", then.as_millis());
+    println!("in {} ms", then.as_millis());
 }
 
 fn bubble_sort(a: &mut [u32; SIZE]) {
