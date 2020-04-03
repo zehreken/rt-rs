@@ -4,6 +4,8 @@ use std::time::{Duration, Instant};
 const SIZE: usize = 10000;
 
 pub fn test_thread() {
+    let main_now = Instant::now();
+
     let mut a = [0u32; SIZE];
     for i in 0..SIZE {
         a[i] = (SIZE - i) as u32;
@@ -24,16 +26,41 @@ pub fn test_thread() {
         let then = Instant::now() - now;
         println!("in {} ms", then.as_millis());
     });
-    // handle2.join().unwrap();
-    // handle1.join().unwrap();
+
+    let handle3 = thread::spawn(move || {
+        let mut _a = a.clone();
+        let now = Instant::now();
+        bubble_sort(&mut _a);
+        let then = Instant::now() - now;
+        println!("in {} ms", then.as_millis());
+    });
+
+    let handle4 = thread::spawn(move || {
+        let mut _a = a.clone();
+        let now = Instant::now();
+        bubble_sort(&mut _a);
+        let then = Instant::now() - now;
+        println!("in {} ms", then.as_millis());
+    });
+    handle1.join().unwrap();
+    handle2.join().unwrap();
+    handle3.join().unwrap();
+    handle4.join().unwrap();
 
     let mut _a = a.clone();
     let mut _b = a.clone();
+    let mut _c = a.clone();
+    let mut _d = a.clone();
     let now = Instant::now();
     bubble_sort(&mut _a);
     bubble_sort(&mut _b);
+    bubble_sort(&mut _c);
+    bubble_sort(&mut _d);
     let then = Instant::now() - now;
     println!("in {} ms", then.as_millis());
+
+    let then = Instant::now() - main_now;
+    println!("total duration {} ms", then.as_millis());
 }
 
 fn bubble_sort(a: &mut [u32; SIZE]) {
