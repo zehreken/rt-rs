@@ -1,28 +1,25 @@
 pub mod fps_utils {
+    use std::time::{Duration, Instant};
     pub struct FpsCounter {
-        time_as_second: u128,
+        now: Instant,
         frames: i32,
     }
 
     impl FpsCounter {
         pub fn new() -> FpsCounter {
             FpsCounter {
-                time_as_second: 0,
+                now: Instant::now(),
                 frames: 0,
             }
         }
 
-        pub fn tick(&mut self, delta_ms: u128) -> i32 {
-            self.time_as_second += delta_ms;
+        pub fn tick(&mut self) {
             self.frames += 1;
-            if self.time_as_second >= 1000 {
-                self.time_as_second -= 1000;
-                let temp = self.frames;
-                self.frames = 0;
-                return temp;
-            }
+        }
 
-            return 0;
+        pub fn average_frames_per_second(self) -> f32 {
+            let duration: Duration = Instant::now() - self.now;
+            self.frames as f32 / duration.as_secs() as f32
         }
     }
 }

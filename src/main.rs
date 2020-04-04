@@ -19,30 +19,16 @@ mod thread_test;
 pub const SAMPLE: u32 = 10;
 
 fn main() {
-    thread_test::test_thread();
-    return;
+    // thread_test::test_thread();
+    // return;
 
     let mut fps_counter = FpsCounter::new();
-    let mut now = Instant::now();
-    let mut fps_counts = Vec::new();
 
     // tracer::save_image(640, 480, 5);
-    // trace_with_minifb(200, 150);
+    trace_with_minifb(400, 300, &mut fps_counter);
     // trace_with_sdl(200, 150);
 
-    let duration: Duration = Instant::now() - now;
-    let fps_count = fps_counter.tick(duration.as_millis());
-    if fps_count > 0 {
-        fps_counts.push(fps_count);
-    }
-    now = Instant::now();
-
-    let mut fps_sum = 0;
-    for i in &fps_counts {
-        fps_sum += i;
-    }
-    let average_fps = fps_sum as f32 / fps_counts.len() as f32;
-    println!("Average fps: {}", average_fps);
+    println!("Average fps: {}", fps_counter.average_frames_per_second());
 }
 
 fn trace_with_sdl(width: u32, height: u32) {
@@ -103,7 +89,7 @@ fn trace_with_sdl(width: u32, height: u32) {
     }
 }
 
-fn trace_with_minifb(width: usize, height: usize) {
+fn trace_with_minifb(width: usize, height: usize, fps_counter: &mut FpsCounter) {
     let mut buffer: Vec<u32> = vec![0; width * height];
 
     let mut window = Window::new(
@@ -134,5 +120,7 @@ fn trace_with_minifb(width: usize, height: usize) {
 
         // We unwrap here as we want this code to exit if it fails. Real applications may want to haneld this in a different way
         window.update_with_buffer(&buffer, width, height).unwrap();
+
+        fps_counter.tick();
     }
 }
