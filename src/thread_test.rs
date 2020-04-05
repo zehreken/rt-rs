@@ -1,18 +1,55 @@
+use rand::Rng;
+use std::sync::mpsc;
+use std::sync::mpsc::{Receiver, Sender};
 use std::thread;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 const SIZE: usize = 10000;
 
 pub fn test_thread() {
     let main_now = Instant::now();
 
+    run_functional();
     // run_main();
-    run_threads();
+    // run_threads();
 
     let then = Instant::now() - main_now;
     println!("total duration {} ms", then.as_millis());
 }
 
+fn run_functional() {
+    let (tx, rx): (Sender<Vec<u8>>, Receiver<Vec<u8>>) = mpsc::channel();
+    let mut children = Vec::new();
+    const NTHREADS: i32 = 4;
+    for _ in 0..NTHREADS {
+        let thread_x = tx.clone();
+        let child = thread::spawn(move || {
+            let mut rng = rand::thread_rng();
+            let mut pixels: Vec<u8> = Vec::with_capacity(5);
+            for _ in 0..pixels.capacity() {
+                pixels.push(rng.gen::<u8>());
+            }
+            thread_x.send(pixels).unwrap();
+        });
+
+        children.push(child);
+    }
+
+    let mut ids = Vec::with_capacity(NTHREADS as usize);
+    for _ in 0..NTHREADS {
+        ids.push(rx.recv());
+    }
+
+    for child in children {
+        child.join().unwrap();
+    }
+
+    for id in ids {
+        println!("{:?}", id.unwrap());
+    }
+}
+
+// To benchmark single thread performance
 fn run_main() {
     let mut a = [0u32; SIZE];
     for i in 0..SIZE {
@@ -40,6 +77,7 @@ fn run_main() {
     println!("main in {} ms", then.as_millis());
 }
 
+// To benchmark multi-thread performance
 fn run_threads() {
     let mut a = [0u32; SIZE];
     for i in 0..SIZE {
