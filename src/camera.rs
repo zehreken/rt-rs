@@ -93,7 +93,7 @@ pub mod camera {
             let look_at: Vec3 = Vec3::new(0.0, 0.0, -1.0);
             let v_up: Vec3 = Vec3::new(0.0, 1.0, 0.0);
             let v_fov: f32 = 60.0;
-            let aspect: f32 = 300 as f32 / 150 as f32;
+            let aspect: f32 = 400 as f32 / 300 as f32;
             let aperture: f32 = 0.1;
             let focus_dist: f32 = (self.origin - look_at).length();
 

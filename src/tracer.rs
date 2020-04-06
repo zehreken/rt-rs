@@ -3,7 +3,11 @@ use crate::primitives::vec3::*;
 use crate::ray::ray::*;
 use crate::sphere::sphere::*;
 use rand::Rng;
+use std::sync::mpsc;
+use std::sync::mpsc::{Receiver, Sender};
+use std::thread;
 
+#[derive(Clone)]
 pub struct Scene {
     camera: Camera,
     objects: Vec<Sphere>,
@@ -37,6 +41,9 @@ pub fn update(scene: &mut Scene) {
     let sample_count = 1.0;
 
     scene.camera.translate(Vec3::new(0.0, 0.0, -0.01));
+    render(scene);
+    return;
+
     for y in 0..height {
         for x in 0..width {
             let color_index = (x + y * width as u32) as usize;
@@ -54,6 +61,62 @@ pub fn update(scene: &mut Scene) {
             scene.pixels[index + 2] = (b * 255.0) as u8;
         }
     }
+}
+
+fn render(scene: &mut Scene) {
+    let width = scene.width;
+    let height = scene.height;
+    let channel_count = scene.channel_count;
+    let (tx, rx): (Sender<Vec<u8>>, Receiver<Vec<u8>>) = mpsc::channel();
+    let mut children = Vec::new();
+    const NTHREADS: u32 = 4;
+    let t_width = width / NTHREADS;
+
+    for t in 0..NTHREADS {
+        let thread_x = tx.clone();
+        let mut scene_x = scene.clone();
+        let child = thread::spawn(move || {
+            let mut rng = rand::thread_rng();
+            let size: usize = (t_width * height as u32) as usize;
+            let mut pixels: Vec<u8> = vec![0; size * channel_count];
+            for i in 0..size {
+                let color_index: usize = i;
+                let mut u: f32 = ((i % t_width as usize) as f32 + rng.gen::<f32>()) / width as f32;
+                u += t as f32 * 0.25;
+                let v: f32 =
+                    ((height - i as u32 / t_width) as f32 + rng.gen::<f32>()) / height as f32;
+                let ray = scene_x.camera.get_ray(u, v);
+                scene_x.colors[color_index] = color(ray, &scene_x.objects, 0);
+
+                let r = scene_x.colors[color_index].r().sqrt();
+                let g = scene_x.colors[color_index].g().sqrt();
+                let b = scene_x.colors[color_index].b().sqrt();
+                let index: usize = i * channel_count;
+                pixels[index] = (r * 255.0) as u8;
+                pixels[index + 1] = (g * 255.0) as u8;
+                pixels[index + 2] = (b * 255.0) as u8;
+            }
+            thread_x.send(pixels).unwrap();
+        });
+
+        children.push(child);
+    }
+
+    let mut ids = Vec::with_capacity(NTHREADS as usize);
+    for _ in 0..NTHREADS {
+        ids.push(rx.recv());
+    }
+
+    for child in children {
+        child.join().unwrap();
+    }
+
+    let mut a = Vec::new();
+    for id in ids {
+        a.append(&mut id.unwrap());
+    }
+
+    scene.pixels = a;
 }
 
 pub fn save_image(width: u32, height: u32, sample: u32) {

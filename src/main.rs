@@ -19,13 +19,13 @@ mod thread_test;
 pub const SAMPLE: u32 = 10;
 
 fn main() {
-    thread_test::test_thread();
-    return;
+    // thread_test::test_thread();
+    // return;
 
     let mut fps_counter = FpsCounter::new();
 
     // tracer::save_image(640, 480, 5);
-    // trace_with_minifb(400, 300, &mut fps_counter);
+    trace_with_minifb(400, 300, &mut fps_counter);
     // trace_with_sdl(200, 150);
 
     println!("Average fps: {}", fps_counter.average_frames_per_second());
