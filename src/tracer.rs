@@ -72,6 +72,38 @@ fn render(scene: &mut Scene) {
     const NTHREADS: u32 = 4;
     let t_width = width / NTHREADS;
 
+    for t in 0..1 {
+        let thread_x = tx.clone();
+        let mut scene_x = scene.clone();
+        let child = thread::spawn(move || {
+            let mut rng = rand::thread_rng();
+            let size: usize = (t_width * height as u32) as usize;
+            let mut pixels: Vec<u8> = vec![0; size * channel_count];
+            for y in 0..height {
+                for x in 0..t_width {
+                    let color_index = (x + y * t_width as u32) as usize;
+                    let index: usize = ((x + y * t_width as u32) * channel_count as u32) as usize;
+                    let u: f32 = (x as f32 + rng.gen::<f32>()) / width as f32;
+                    let v: f32 = ((height - y) as f32 + rng.gen::<f32>()) / height as f32; // invert y
+                                                                                           // println!("{}, {}", u, v);
+                    let ray = scene_x.camera.get_ray(u, v);
+                    scene_x.colors[color_index] = color(ray, &scene_x.objects, 0);
+
+                    let r = scene_x.colors[color_index].r().sqrt();
+                    let g = scene_x.colors[color_index].g().sqrt();
+                    let b = scene_x.colors[color_index].b().sqrt();
+                    pixels[index] = (r * 255.0) as u8;
+                    pixels[index + 1] = (g * 255.0) as u8;
+                    pixels[index + 2] = (b * 255.0) as u8;
+                }
+            }
+            thread_x.send(pixels).unwrap();
+        });
+
+        children.push(child);
+    }
+
+    /*
     for t in 0..NTHREADS {
         let thread_x = tx.clone();
         let mut scene_x = scene.clone();
@@ -101,9 +133,10 @@ fn render(scene: &mut Scene) {
 
         children.push(child);
     }
+    */
 
-    let mut ids = Vec::with_capacity(NTHREADS as usize);
-    for _ in 0..NTHREADS {
+    let mut ids = Vec::with_capacity(1 as usize);
+    for _ in 0..1 {
         ids.push(rx.recv());
     }
 

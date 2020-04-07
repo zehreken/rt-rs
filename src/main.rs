@@ -111,11 +111,13 @@ fn trace_with_minifb(width: usize, height: usize, fps_counter: &mut FpsCounter) 
         tracer::update(&mut scene);
         let mut index = 0;
         for i in buffer.iter_mut() {
-            let color: u32 = ((scene.pixels[index] as u32) << 16)
-                + ((scene.pixels[index + 1] as u32) << 8)
-                + (scene.pixels[index + 2] as u32);
-            *i = color;
-            index += 3;
+            if index < 90000 {
+                let color: u32 = ((scene.pixels[index] as u32) << 16)
+                    + ((scene.pixels[index + 1] as u32) << 8)
+                    + (scene.pixels[index + 2] as u32);
+                *i = color;
+                index += 3;
+            }
         }
 
         // We unwrap here as we want this code to exit if it fails. Real applications may want to haneld this in a different way
