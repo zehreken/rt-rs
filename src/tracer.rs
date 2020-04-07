@@ -33,14 +33,28 @@ pub fn create_scene(width: u32, height: u32, channel_count: usize) -> Scene {
     }
 }
 
-pub fn update(scene: &mut Scene) {
+pub fn update(scene: &mut Scene, keys: u8) {
     let mut rng = rand::thread_rng();
     let width = scene.width;
     let height = scene.height;
     let channel_count = scene.channel_count;
     let sample_count = 1.0;
 
-    scene.camera.translate(Vec3::new(0.0, 0.0, -0.01));
+    // 0000ADWS
+    let mut velocity = Vec3::zero();
+    if keys & 0b1000 == 0b1000 {
+        velocity = velocity + Vec3::new(-0.01, 0.0, 0.0);
+    }
+    if keys & 0b100 == 0b100 {
+        velocity = velocity + Vec3::new(0.01, 0.0, 0.0);
+    }
+    if keys & 0b10 == 0b10 {
+        velocity = velocity + Vec3::new(0.0, 0.0, -0.01);
+    }
+    if keys & 0b1 == 0b1 {
+        velocity = velocity + Vec3::new(0.0, 0.0, 0.01);
+    }
+    scene.camera.translate(velocity);
     render(scene);
     return;
 

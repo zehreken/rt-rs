@@ -72,7 +72,7 @@ fn trace_with_sdl(width: u32, height: u32) {
             }
         }
 
-        tracer::update(&mut scene);
+        tracer::update(&mut scene, 0);
 
         framebuffer
             .update(None, &scene.pixels, width as usize * CHANNEL_COUNT)
@@ -108,7 +108,20 @@ fn trace_with_minifb(width: usize, height: usize, fps_counter: &mut FpsCounter) 
     window.limit_update_rate(Some(std::time::Duration::from_micros(16600)));
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
-        tracer::update(&mut scene);
+        let mut keys: u8 = 0; // 0000ADWS
+        if window.is_key_down(Key::A) {
+            keys += 1 << 3;
+        }
+        if window.is_key_down(Key::D) {
+            keys += 1 << 2;
+        }
+        if window.is_key_down(Key::W) {
+            keys += 1 << 1;
+        }
+        if window.is_key_down(Key::S) {
+            keys += 1;
+        }
+        tracer::update(&mut scene, keys);
         let mut index = 0;
         for i in buffer.iter_mut() {
             let color: u32 = ((scene.pixels[index] as u32) << 16)
