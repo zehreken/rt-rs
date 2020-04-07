@@ -67,10 +67,10 @@ fn render(scene: &mut Scene) {
     let width = scene.width;
     let height = scene.height;
     let channel_count = scene.channel_count;
-    let (tx, rx): (Sender<Vec<u8>>, Receiver<Vec<u8>>) = mpsc::channel();
+    let (tx, rx): (Sender<(u8, Vec<u8>)>, Receiver<(u8, Vec<u8>)>) = mpsc::channel();
     let mut children = Vec::new();
-    const NTHREADS: u32 = 4;
-    let t_height = height / NTHREADS;
+    const NTHREADS: u8 = 4;
+    let t_height = height / NTHREADS as u32;
 
     for t in 0..NTHREADS {
         let thread_x = tx.clone();
@@ -97,56 +97,26 @@ fn render(scene: &mut Scene) {
                     pixels[index + 2] = (b * 255.0) as u8;
                 }
             }
-            thread_x.send(pixels).unwrap();
+            thread_x.send((t, pixels)).unwrap();
         });
 
         children.push(child);
     }
 
-    /*
-    for t in 0..NTHREADS {
-        let thread_x = tx.clone();
-        let mut scene_x = scene.clone();
-        let child = thread::spawn(move || {
-            let mut rng = rand::thread_rng();
-            let size: usize = (t_width * height as u32) as usize;
-            let mut pixels: Vec<u8> = vec![0; size * channel_count];
-            for i in 0..size {
-                let color_index: usize = i;
-                let mut u: f32 = ((i % t_width as usize) as f32 + rng.gen::<f32>()) / width as f32;
-                u += t as f32 * 0.25;
-                let v: f32 =
-                    ((height - i as u32 / t_width) as f32 + rng.gen::<f32>()) / height as f32;
-                let ray = scene_x.camera.get_ray(u, v);
-                scene_x.colors[color_index] = color(ray, &scene_x.objects, 0);
-
-                let r = scene_x.colors[color_index].r().sqrt();
-                let g = scene_x.colors[color_index].g().sqrt();
-                let b = scene_x.colors[color_index].b().sqrt();
-                let index: usize = i * channel_count;
-                pixels[index] = (r * 255.0) as u8;
-                pixels[index + 1] = (g * 255.0) as u8;
-                pixels[index + 2] = (b * 255.0) as u8;
-            }
-            thread_x.send(pixels).unwrap();
-        });
-
-        children.push(child);
-    }
-    */
-
-    let mut ids = Vec::with_capacity(1 as usize);
+    let mut ids = Vec::with_capacity(NTHREADS as usize);
     for _ in 0..NTHREADS {
-        ids.push(rx.recv());
+        ids.push(rx.recv().unwrap());
     }
 
     for child in children {
         child.join().unwrap();
     }
 
+    // sort ids
+    ids.sort_by(|a, b| b.0.cmp(&a.0));
     let mut a = Vec::new();
-    for id in ids {
-        a.append(&mut id.unwrap());
+    for mut id in ids {
+        a.append(&mut id.1);
     }
 
     scene.pixels = a;
