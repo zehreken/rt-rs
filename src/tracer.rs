@@ -70,22 +70,22 @@ fn render(scene: &mut Scene) {
     let (tx, rx): (Sender<Vec<u8>>, Receiver<Vec<u8>>) = mpsc::channel();
     let mut children = Vec::new();
     const NTHREADS: u32 = 4;
-    let t_width = width / NTHREADS;
+    let t_height = height / NTHREADS;
 
-    for t in 0..1 {
+    for t in 0..NTHREADS {
         let thread_x = tx.clone();
         let mut scene_x = scene.clone();
         let child = thread::spawn(move || {
             let mut rng = rand::thread_rng();
-            let size: usize = (t_width * height as u32) as usize;
+            let size: usize = (width * t_height as u32) as usize;
             let mut pixels: Vec<u8> = vec![0; size * channel_count];
-            for y in 0..height {
-                for x in 0..t_width {
-                    let color_index = (x + y * t_width as u32) as usize;
-                    let index: usize = ((x + y * t_width as u32) * channel_count as u32) as usize;
+            for y in 0..t_height {
+                for x in 0..width {
+                    let color_index = (x + y * width as u32) as usize;
+                    let index: usize = ((x + y * width as u32) * channel_count as u32) as usize;
                     let u: f32 = (x as f32 + rng.gen::<f32>()) / width as f32;
-                    let v: f32 = ((height - y) as f32 + rng.gen::<f32>()) / height as f32; // invert y
-                                                                                           // println!("{}, {}", u, v);
+                    let mut v: f32 = ((t_height - y) as f32 + rng.gen::<f32>()) / height as f32; // invert y
+                    v += t as f32 * 0.25;
                     let ray = scene_x.camera.get_ray(u, v);
                     scene_x.colors[color_index] = color(ray, &scene_x.objects, 0);
 
@@ -136,7 +136,7 @@ fn render(scene: &mut Scene) {
     */
 
     let mut ids = Vec::with_capacity(1 as usize);
-    for _ in 0..1 {
+    for _ in 0..NTHREADS {
         ids.push(rx.recv());
     }
 
