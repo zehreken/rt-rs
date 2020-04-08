@@ -9,6 +9,7 @@ pub mod camera {
     pub struct Camera {
         origin: Vec3,
         lower_left_corner: Vec3,
+        aspect: f32,
         horizontal: Vec3,
         vertical: Vec3,
         u: Vec3,
@@ -21,6 +22,7 @@ pub mod camera {
         pub fn new(
             origin: Vec3,
             lower_left_corner: Vec3,
+            aspect: f32,
             horizontal: Vec3,
             vertical: Vec3,
             u: Vec3,
@@ -31,6 +33,7 @@ pub mod camera {
             Camera {
                 origin: origin,
                 lower_left_corner: lower_left_corner,
+                aspect,
                 horizontal: horizontal,
                 vertical: vertical,
                 u: u,
@@ -67,6 +70,7 @@ pub mod camera {
             return Camera::new(
                 origin,
                 lower_left_corner,
+                aspect,
                 horizontal,
                 vertical,
                 v,
@@ -93,14 +97,13 @@ pub mod camera {
             let look_at: Vec3 = Vec3::new(0.0, 0.0, -1.0);
             let v_up: Vec3 = Vec3::new(0.0, 1.0, 0.0);
             let v_fov: f32 = 60.0;
-            let aspect: f32 = 400 as f32 / 300 as f32;
             let aperture: f32 = 0.1;
             let focus_dist: f32 = (self.origin - look_at).length();
 
             self.lens_radius = aperture / 2.0;
             let theta: f32 = v_fov * PI / 180.0;
             let half_height: f32 = (theta / 2.0).tan();
-            let half_width = aspect * half_height;
+            let half_width = self.aspect * half_height;
             self.w = (self.origin - look_at).unit_vector();
             self.u = Vec3::cross(v_up, self.w).unit_vector();
             self.v = Vec3::cross(self.w, self.u);

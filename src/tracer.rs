@@ -19,8 +19,7 @@ pub struct Scene {
 }
 
 pub fn create_scene(width: u32, height: u32, channel_count: usize) -> Scene {
-    let mut camera = Camera::get_camera(width, height);
-    // objects.push(Sphere::new(Vec3::new(0.0, -1000.5, -1.0), 1000.0)); // This causes a weird glitch
+    let camera = Camera::get_camera(width, height);
 
     Scene {
         camera,
@@ -34,47 +33,22 @@ pub fn create_scene(width: u32, height: u32, channel_count: usize) -> Scene {
 }
 
 pub fn update(scene: &mut Scene, keys: u8) {
-    let mut rng = rand::thread_rng();
-    let width = scene.width;
-    let height = scene.height;
-    let channel_count = scene.channel_count;
-    let sample_count = 1.0;
-
     // 0000ADWS
     let mut velocity = Vec3::zero();
     if keys & 0b1000 == 0b1000 {
-        velocity = velocity + Vec3::new(-0.01, 0.0, 0.0);
+        velocity = velocity + Vec3::new(-0.02, 0.0, 0.0);
     }
     if keys & 0b100 == 0b100 {
-        velocity = velocity + Vec3::new(0.01, 0.0, 0.0);
+        velocity = velocity + Vec3::new(0.02, 0.0, 0.0);
     }
     if keys & 0b10 == 0b10 {
-        velocity = velocity + Vec3::new(0.0, 0.0, -0.01);
+        velocity = velocity + Vec3::new(0.0, 0.0, -0.02);
     }
     if keys & 0b1 == 0b1 {
-        velocity = velocity + Vec3::new(0.0, 0.0, 0.01);
+        velocity = velocity + Vec3::new(0.0, 0.0, 0.02);
     }
     scene.camera.translate(velocity);
     render(scene);
-    return;
-
-    for y in 0..height {
-        for x in 0..width {
-            let color_index = (x + y * width as u32) as usize;
-            let index: usize = ((x + y * width as u32) * channel_count as u32) as usize;
-            let u: f32 = (x as f32 + rng.gen::<f32>()) / width as f32;
-            let v: f32 = ((height - y) as f32 + rng.gen::<f32>()) / height as f32; // invert y
-            let ray = scene.camera.get_ray(u, v);
-            scene.colors[color_index] = color(ray, &scene.objects, 0);
-
-            let r = (scene.colors[color_index].r() / sample_count).sqrt();
-            let g = (scene.colors[color_index].g() / sample_count).sqrt();
-            let b = (scene.colors[color_index].b() / sample_count).sqrt();
-            scene.pixels[index] = (r * 255.0) as u8;
-            scene.pixels[index + 1] = (g * 255.0) as u8;
-            scene.pixels[index + 2] = (b * 255.0) as u8;
-        }
-    }
 }
 
 fn render(scene: &mut Scene) {
