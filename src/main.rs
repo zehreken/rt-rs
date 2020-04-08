@@ -4,7 +4,7 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::{Color, PixelFormatEnum};
 use sdl2::rect::Rect;
 use sdl2::render::*;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 mod camera;
 mod fps_utils;
 mod primitives;
@@ -16,15 +16,13 @@ mod tracer;
 use minifb::{Key, Window, WindowOptions};
 mod thread_test;
 
-pub const SAMPLE: u32 = 10;
-
 fn main() {
     // thread_test::test_thread();
     // return;
 
     let mut fps_counter = FpsCounter::new();
 
-    // tracer::save_image(640, 480, 5);
+    // tracer::save_image(800, 600, 50);
     trace_with_minifb(400, 300, &mut fps_counter);
     // trace_with_sdl(200, 150);
 
@@ -131,7 +129,7 @@ fn trace_with_minifb(width: usize, height: usize, fps_counter: &mut FpsCounter) 
             index += 3;
         }
 
-        // We unwrap here as we want this code to exit if it fails. Real applications may want to haneld this in a different way
+        // We unwrap here as we want this code to exit if it fails. Real applications may want to handle this in a different way
         window.update_with_buffer(&buffer, width, height).unwrap();
 
         fps_counter.tick();

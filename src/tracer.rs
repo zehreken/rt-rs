@@ -187,6 +187,13 @@ fn get_objects() -> Vec<Sphere> {
         0.2,
     ));
     objects.push(Sphere::new(
+        Vec3::new(1.0, 0.0, -3.0),
+        0.5,
+        1, // metal
+        Vec3::new(1.0, 1.0, 1.0),
+        1.0,
+    ));
+    objects.push(Sphere::new(
         Vec3::new(-1.0, -0.0, -1.0),
         0.5,
         2, // dielectric
@@ -204,7 +211,7 @@ fn get_objects() -> Vec<Sphere> {
         Vec3::new(0.0, -100.5, -1.0),
         100.0,
         0,
-        Vec3::new(0.1, 0.1, 0.5),
+        Vec3::new(0.3, 0.1, 0.5),
         0.0,
     ));
 

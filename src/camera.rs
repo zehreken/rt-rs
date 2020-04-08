@@ -44,7 +44,7 @@ pub mod camera {
         }
 
         pub fn get_camera(width: u32, height: u32) -> Camera {
-            let look_from: Vec3 = Vec3::new(0.9, 0.1, 2.0);
+            let look_from: Vec3 = Vec3::new(-0.37, 0.1, -4.3);
             let look_at: Vec3 = Vec3::new(0.0, 0.0, -1.0);
             let v_up: Vec3 = Vec3::new(0.0, 1.0, 0.0);
             let v_fov: f32 = 60.0;
@@ -99,6 +99,8 @@ pub mod camera {
             let v_fov: f32 = 60.0;
             let aperture: f32 = 0.1;
             let focus_dist: f32 = (self.origin - look_at).length();
+
+            println!("{:?}", self.origin);
 
             self.lens_radius = aperture / 2.0;
             let theta: f32 = v_fov * PI / 180.0;
