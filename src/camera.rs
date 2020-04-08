@@ -100,8 +100,6 @@ pub mod camera {
             let aperture: f32 = 0.1;
             let focus_dist: f32 = (self.origin - look_at).length();
 
-            println!("{:?}", self.origin);
-
             self.lens_radius = aperture / 2.0;
             let theta: f32 = v_fov * PI / 180.0;
             let half_height: f32 = (theta / 2.0).tan();

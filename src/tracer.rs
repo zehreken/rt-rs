@@ -119,7 +119,7 @@ pub fn save_image(width: u32, height: u32, sample: u32) {
 
     for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
         let mut col = Vec3::zero();
-        for _z in 0..sample {
+        for _ in 0..sample {
             let u: f32 = (x as f32 + rng.gen::<f32>()) / width as f32;
             let v: f32 = ((height - y) as f32 + rng.gen::<f32>()) / height as f32; // invert y
             let ray = camera.get_ray(u, v);
