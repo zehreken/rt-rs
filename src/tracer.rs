@@ -59,6 +59,7 @@ fn render(scene: &mut Scene) {
     let mut children = Vec::new();
     const NTHREADS: u8 = 4;
     let t_height = height / NTHREADS as u32;
+    let t_offset: f32 = 1.0 / NTHREADS as f32;
 
     for t in 0..NTHREADS {
         let thread_x = tx.clone();
@@ -73,7 +74,7 @@ fn render(scene: &mut Scene) {
                     let index: usize = ((x + y * width as u32) * channel_count as u32) as usize;
                     let u: f32 = (x as f32 + rng.gen::<f32>()) / width as f32;
                     let mut v: f32 = ((t_height - y) as f32 + rng.gen::<f32>()) / height as f32; // invert y
-                    v += t as f32 * 0.25;
+                    v += t as f32 * t_offset;
                     let ray = scene_x.camera.get_ray(u, v);
                     scene_x.colors[color_index] = color(ray, &scene_x.objects, 0);
 
@@ -102,12 +103,12 @@ fn render(scene: &mut Scene) {
 
     // sort ids
     ids.sort_by(|a, b| b.0.cmp(&a.0));
-    let mut a = Vec::new();
+    let mut sum = Vec::new();
     for mut id in ids {
-        a.append(&mut id.1);
+        sum.append(&mut id.1);
     }
 
-    scene.pixels = a;
+    scene.pixels = sum;
 }
 
 pub fn save_image(width: u32, height: u32, sample: u32) {
