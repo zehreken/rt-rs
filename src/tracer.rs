@@ -54,7 +54,7 @@ pub fn update(scene: &mut Scene, keys: u8) {
 fn render(scene: &mut Scene) {
     let width = scene.width;
     let height = scene.height;
-    let channel_count = scene.channel_count;
+    let channel_count = scene.channel_count; // Color channel
     let (tx, rx): (Sender<(u8, Vec<u8>)>, Receiver<(u8, Vec<u8>)>) = mpsc::channel();
     let mut children = Vec::new();
     const NTHREADS: u8 = 4;
