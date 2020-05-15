@@ -115,7 +115,7 @@ pub fn save_image(width: u32, height: u32, sample: u32) {
     let mut img_buf = image::ImageBuffer::new(width, height);
     let mut rng = rand::thread_rng();
     let camera = Camera::get_camera(width, height);
-    let objects = get_objects();
+    let objects = get_simple_scene();//get_objects();
 
     for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
         let mut col = Vec3::zero();
@@ -141,7 +141,7 @@ pub fn save_image(width: u32, height: u32, sample: u32) {
 fn color(ray: Ray, objects: &[Sphere], depth: u8) -> Vec3 {
     let mut hit_record: HitRecord = HitRecord::new();
     let mut has_hit = false;
-    let t_min: f32 = 0.0;
+    let t_min: f32 = 0.001;
     let mut closest_so_far: f32 = std::f32::MAX;
     let mut temp_obj = Sphere::new(Vec3::zero(), 0.0, 0, Vec3::zero(), 0.0);
 
@@ -168,6 +168,33 @@ fn color(ray: Ray, objects: &[Sphere], depth: u8) -> Vec3 {
 
         return (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0);
     }
+}
+
+fn get_simple_scene() -> Vec<Sphere> {
+    let mut objects: Vec<Sphere> = Vec::new();
+    objects.push(Sphere::new(
+        Vec3::new(-0.5, 0.0, 0.0),
+        0.5,
+        0,
+        Vec3::new(0.5, 0.5, 0.5),
+        0.0,
+    ));
+    objects.push(Sphere::new(
+        Vec3::new(0.5, 0.0, 0.0),
+        0.5,
+        0,
+        Vec3::new(0.7, 0.7, 0.7),
+        0.0,
+    ));
+    objects.push(Sphere::new(
+        Vec3::new(0.0, -100.5, 0.0),
+        100.0,
+        0,
+        Vec3::new(0.7, 0.1, 0.7),
+        0.0,
+    ));
+
+    objects
 }
 
 fn get_objects() -> Vec<Sphere> {
