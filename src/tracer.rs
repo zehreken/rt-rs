@@ -111,11 +111,36 @@ fn render(scene: &mut Scene) {
     scene.pixels = sum;
 }
 
+pub fn save_image_mt(width: u32, height: u32, sample: u32) {
+    let mut img_buf = image::ImageBuffer::new(width, height);
+    let mut scene = create_scene(width, height, 3);
+
+    let mut pixels: Vec<f32> = vec![0.0; width as usize * height as usize * 3];
+    for _ in 0..sample {
+        render(&mut scene);
+        for i in 0..pixels.len() {
+            pixels[i] += scene.pixels[i] as f32 / sample as f32;
+        }
+    }
+
+    let mut index = 0;
+    for (_, _, pixel) in img_buf.enumerate_pixels_mut() {
+        *pixel = image::Rgb([
+            pixels[index] as u8,
+            pixels[index + 1] as u8,
+            pixels[index + 2] as u8,
+        ]);
+        index += 3;
+    }
+
+    img_buf.save("out/basic_mt.png").unwrap();
+}
+
 pub fn save_image(width: u32, height: u32, sample: u32) {
     let mut img_buf = image::ImageBuffer::new(width, height);
     let mut rng = rand::thread_rng();
     let camera = Camera::get_camera(width, height);
-    let objects = get_simple_scene(); //get_objects();
+    let objects = get_objects();
 
     for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
         let mut col = Vec3::zero();

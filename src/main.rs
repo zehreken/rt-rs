@@ -23,7 +23,8 @@ fn main() {
     let mut fps_counter = FpsCounter::new();
 
     // tracer::save_image(800, 600, 500);
-    trace_with_minifb(400, 300, &mut fps_counter);
+    tracer::save_image_mt(800, 600, 500);
+    // trace_with_minifb(400, 300, &mut fps_counter);
     // trace_with_sdl(200, 150);
 
     println!("Average fps: {}", fps_counter.average_frames_per_second());
