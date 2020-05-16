@@ -22,7 +22,7 @@ fn main() {
 
     let mut fps_counter = FpsCounter::new();
 
-    // tracer::save_image(800, 600, 50);
+    // tracer::save_image(800, 600, 500);
     trace_with_minifb(400, 300, &mut fps_counter);
     // trace_with_sdl(200, 150);
 

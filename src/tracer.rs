@@ -1,7 +1,7 @@
-use crate::camera::camera::*;
+use crate::camera::*;
 use crate::primitives::vec3::*;
-use crate::ray::ray::*;
-use crate::sphere::sphere::*;
+use crate::ray::*;
+use crate::sphere::*;
 use rand::Rng;
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
@@ -115,7 +115,7 @@ pub fn save_image(width: u32, height: u32, sample: u32) {
     let mut img_buf = image::ImageBuffer::new(width, height);
     let mut rng = rand::thread_rng();
     let camera = Camera::get_camera(width, height);
-    let objects = get_simple_scene();//get_objects();
+    let objects = get_simple_scene(); //get_objects();
 
     for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
         let mut col = Vec3::zero();
