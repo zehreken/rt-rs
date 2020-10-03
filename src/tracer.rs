@@ -23,7 +23,7 @@ pub fn create_scene(width: u32, height: u32, channel_count: usize) -> Scene {
 
     Scene {
         camera,
-        objects: get_objects(),
+        objects: super::strict_covers::get_objects(),
         width,
         height,
         channel_count,
